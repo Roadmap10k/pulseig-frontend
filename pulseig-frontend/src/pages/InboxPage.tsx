@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { conversationsApi } from '../api';
 import { useAuthStore } from '../store';
@@ -20,7 +22,7 @@ const Avatar = ({ name, style }: { name: string; style?: React.CSSProperties }) 
 };
 
 export default function InboxPage() {
-  const { business } = useAuthStore();
+  useAuthStore();
   const [conversations, setConversations] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -42,10 +44,10 @@ export default function InboxPage() {
       if (!selectedId && res.data.conversations?.length > 0) {
         selectConversation(res.data.conversations[0].id);
       }
-    } catch { /* use demo data */ } finally {
+    } catch { } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, [filter, selectedId]);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
@@ -68,12 +70,10 @@ export default function InboxPage() {
     const text = input.trim();
     setInput('');
     setSending(true);
-    // Optimistic UI
     const optimistic = { id: 'opt_' + Date.now(), sender: 'business', content: text, created_at: new Date().toISOString(), sent_by_ai: false };
     setMessages(prev => [...prev, optimistic]);
     try {
       await conversationsApi.sendMessage(selectedId, text);
-      // Reload messages to get AI response
       setTimeout(async () => {
         const res = await conversationsApi.get(selectedId);
         setMessages(res.data.messages || []);
@@ -97,7 +97,6 @@ export default function InboxPage() {
   return (
     <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
-      {/* CONVERSATION LIST */}
       <div style={{ width: 280, background: 'var(--surface)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
         <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -150,11 +149,9 @@ export default function InboxPage() {
         </div>
       </div>
 
-      {/* CHAT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {selectedConv ? (
           <>
-            {/* Chat header */}
             <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12, background: 'var(--surface)', flexShrink: 0 }}>
               <Avatar name={contact?.contact_name} style={{ width: 34, height: 34, fontSize: 12 }} />
               <div style={{ flex: 1 }}>
@@ -169,9 +166,7 @@ export default function InboxPage() {
                   <span>score <strong style={{ color: 'var(--blue)' }}>{contact?.intent_score}/100</strong></span>
                 </div>
               </div>
-              <button
-                onClick={toggleAI}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer' }}>
+              <button onClick={toggleAI} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer' }}>
                 <div style={{ width: 30, height: 16, background: aiOn ? 'var(--blue)' : 'var(--border2)', borderRadius: 8, position: 'relative', transition: 'background 0.2s' }}>
                   <div style={{ position: 'absolute', top: 2, left: aiOn ? 16 : 2, width: 12, height: 12, background: '#fff', borderRadius: '50%', transition: 'left 0.2s' }} />
                 </div>
@@ -179,17 +174,10 @@ export default function InboxPage() {
               </button>
             </div>
 
-            {/* Messages */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {messages.map(msg => (
                 <div key={msg.id} style={{ maxWidth: '68%', alignSelf: msg.sender === 'contact' ? 'flex-start' : 'flex-end' }}>
-                  <div style={{
-                    padding: '9px 13px', borderRadius: 10, fontSize: 12, lineHeight: 1.6,
-                    background: msg.sender === 'contact' ? 'var(--surface2)' : 'var(--accent)',
-                    color: msg.sender === 'contact' ? 'var(--text)' : '#fff',
-                    borderBottomLeftRadius: msg.sender === 'contact' ? 3 : 10,
-                    borderBottomRightRadius: msg.sender !== 'contact' ? 3 : 10,
-                  }}>
+                  <div style={{ padding: '9px 13px', borderRadius: 10, fontSize: 12, lineHeight: 1.6, background: msg.sender === 'contact' ? 'var(--surface2)' : 'var(--accent)', color: msg.sender === 'contact' ? 'var(--text)' : '#fff', borderBottomLeftRadius: msg.sender === 'contact' ? 3 : 10, borderBottomRightRadius: msg.sender !== 'contact' ? 3 : 10 }}>
                     {msg.content}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, padding: '0 2px', justifyContent: msg.sender !== 'contact' ? 'flex-end' : 'flex-start' }}>
@@ -210,18 +198,9 @@ export default function InboxPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-              <textarea
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                placeholder="Mensaje manual... (Enter para enviar)"
-                rows={1}
-                style={{ flex: 1, padding: '9px 13px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, fontFamily: 'Inter, sans-serif', background: 'var(--surface2)', color: 'var(--text)', resize: 'none', maxHeight: 90, lineHeight: 1.5, outline: 'none' }}
-              />
-              <button onClick={sendMessage} disabled={!input.trim() || sending}
-                style={{ width: 36, height: 36, background: input.trim() ? 'var(--accent)' : 'var(--border)', border: 'none', borderRadius: 8, cursor: input.trim() ? 'pointer' : 'default', color: '#fff', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.1s', flexShrink: 0 }}>
+              <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Mensaje manual... (Enter para enviar)" rows={1} style={{ flex: 1, padding: '9px 13px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, fontFamily: 'Inter, sans-serif', background: 'var(--surface2)', color: 'var(--text)', resize: 'none', maxHeight: 90, lineHeight: 1.5, outline: 'none' }} />
+              <button onClick={sendMessage} disabled={!input.trim() || sending} style={{ width: 36, height: 36, background: input.trim() ? 'var(--accent)' : 'var(--border)', border: 'none', borderRadius: 8, cursor: input.trim() ? 'pointer' : 'default', color: '#fff', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.1s', flexShrink: 0 }}>
                 ↑
               </button>
             </div>
@@ -234,10 +213,8 @@ export default function InboxPage() {
         )}
       </div>
 
-      {/* PROFILE PANEL */}
       {selectedConv && (
         <div style={{ width: 240, background: 'var(--surface)', borderLeft: '1px solid var(--border)', overflowY: 'auto', flexShrink: 0 }}>
-          {/* Score */}
           <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Score de intención</div>
             <div className="mono" style={{ fontSize: 36, color: 'var(--text)', lineHeight: 1 }}>{contact?.intent_score || 0}</div>
@@ -248,7 +225,6 @@ export default function InboxPage() {
               <div style={{ height: '100%', width: `${contact?.intent_score || 0}%`, background: BAR_COLOR[contact?.segment] || '#6B7280', borderRadius: 2 }} />
             </div>
           </div>
-          {/* Segment + Tags */}
           <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Segmento</div>
             <span className={SEG_CLASS[contact?.segment] || 'seg-cold'} style={{ fontSize: 11, padding: '3px 8px' }}>{SEG_LABEL[contact?.segment] || 'DESCONOCIDO'}</span>
@@ -260,7 +236,6 @@ export default function InboxPage() {
               </div>
             )}
           </div>
-          {/* Contact data */}
           <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Datos</div>
             {[
@@ -276,8 +251,7 @@ export default function InboxPage() {
               </div>
             ))}
           </div>
-          {/* Channels */}
-          <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ padding: '14px 16px' }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Canal</div>
             <span className={CH_CLASS[contact?.channel] || 'ch-ig'}>{CH_LABEL[contact?.channel] || contact?.channel}</span>
           </div>
