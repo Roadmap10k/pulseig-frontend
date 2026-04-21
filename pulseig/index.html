@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseIG — Panel de Control</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #18181f;
+  --bg4: #1e1e28;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f5;
+  --text2: #8888a0;
+  --text3: #55556a;
+  --purple: #a78bfa;
+  --purple2: #7c3aed;
+  --purple3: #2d1b69;
+  --purple4: #1a0f3d;
+  --green: #34d399;
+  --green2: #064e3b;
+  --amber: #fbbf24;
+  --amber2: #451a03;
+  --red: #f87171;
+  --red2: #450a0a;
+  --blue: #60a5fa;
+  --blue2: #1e3a5f;
+  --pink: #f472b6;
+  --accent: #a78bfa;
+  --radius: 10px;
+  --radius2: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; font-size: 13px; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 56px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 4px;
+  z-index: 10;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; color: white;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+.nav-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text3);
+  border: none; background: transparent;
+  transition: all 0.15s;
+  font-size: 16px;
+  position: relative;
+}
+.nav-btn:hover { background: var(--bg3); color: var(--text2); }
+.nav-btn.active { background: var(--purple3); color: var(--purple); }
+.nav-btn .notif {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--red); border-radius: 50%;
+  border: 1.5px solid var(--bg2);
+}
+.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* LEFT PANEL */
+.left-panel {
+  width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.search-box {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.search-box::placeholder { color: var(--text3); }
+.search-box:focus { border-color: var(--border2); }
+
+.filter-tabs {
+  display: flex; gap: 4px; margin-top: 10px;
+}
+.ftab {
+  flex: 1; text-align: center;
+  padding: 5px 4px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text3);
+  background: transparent;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.ftab.active { background: var(--purple3); color: var(--purple); border-color: transparent; }
+
+.contact-list { overflow-y: auto; flex: 1; }
+.contact-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+  position: relative;
+}
+.contact-item:hover { background: var(--bg3); }
+.contact-item.active { background: var(--bg4); }
+.contact-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--purple);
+  border-radius: 0 2px 2px 0;
+}
+.ci-top { display: flex; align-items: center; gap: 9px; }
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  flex-shrink: 0;
+}
+.ci-info { flex: 1; min-width: 0; }
+.ci-name { font-size: 12px; font-weight: 500; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+.ci-preview { font-size: 11px; color: var(--text3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ci-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; }
+.score-track { flex: 1; height: 3px; background: var(--bg4); border-radius: 2px; margin-right: 8px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; }
+.score-label { font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.ch-dot { width: 5px; height: 5px; border-radius: 50%; margin-right: 4px; display: inline-block; }
+.tag-hot { color: #fca5a5; font-size: 9px; font-weight: 600; background: var(--red2); padding: 1px 5px; border-radius: 4px; }
+.tag-warm { color: #fcd34d; font-size: 9px; font-weight: 600; background: var(--amber2); padding: 1px 5px; border-radius: 4px; }
+.tag-cold { color: #93c5fd; font-size: 9px; font-weight: 600; background: var(--blue2); padding: 1px 5px; border-radius: 4px; }
+.time-label { font-size: 10px; color: var(--text3); }
+
+/* MAIN AREA */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+.main-view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.main-view.active { display: flex; }
+
+/* CHAT VIEW */
+.chat-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+}
+.chat-header-info { flex: 1; }
+.chat-header-info .name { font-size: 14px; font-weight: 500; }
+.chat-header-info .meta { font-size: 11px; color: var(--text2); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+.ai-toggle {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  cursor: pointer;
+}
+.toggle-dot {
+  width: 28px; height: 16px;
+  background: var(--purple2); border-radius: 8px;
+  position: relative; transition: background 0.2s;
+}
+.toggle-dot::after {
+  content: ''; position: absolute;
+  top: 2px; left: 14px;
+  width: 12px; height: 12px;
+  background: white; border-radius: 50%;
+  transition: left 0.2s;
+}
+.toggle-dot.off { background: var(--bg4); }
+.toggle-dot.off::after { left: 2px; }
+.toggle-label { font-size: 11px; font-weight: 500; color: var(--text2); }
+
+.messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.msg-group { display: flex; flex-direction: column; gap: 4px; }
+.msg { max-width: 72%; }
+.msg.incoming { align-self: flex-start; }
+.msg.outgoing { align-self: flex-end; }
+.msg-bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.msg.incoming .msg-bubble { background: var(--bg3); color: var(--text); border-bottom-left-radius: 4px; }
+.msg.outgoing .msg-bubble { background: var(--purple2); color: white; border-bottom-right-radius: 4px; }
+.msg-meta { font-size: 10px; color: var(--text3); padding: 0 4px; margin-top: 2px; }
+.msg.outgoing .msg-meta { text-align: right; }
+.ai-indicator { font-size: 9px; color: var(--purple); font-weight: 500; text-align: right; padding: 0 4px; }
+
+.input-area {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.msg-textarea {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+  min-height: 42px;
+  max-height: 100px;
+}
+.msg-textarea:focus { border-color: var(--border2); }
+.send-btn {
+  width: 40px; height: 40px;
+  background: var(--purple2);
+  border: none; border-radius: 10px;
+  cursor: pointer; color: white;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.send-btn:hover { background: #6d28d9; transform: scale(0.97); }
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 240px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.rp-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.rp-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.score-display { display: flex; align-items: baseline; gap: 6px; }
+.score-num { font-size: 36px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--purple); line-height: 1; }
+.score-context { font-size: 11px; color: var(--text2); }
+.big-track { height: 5px; background: var(--bg4); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+.big-fill { height: 100%; background: linear-gradient(90deg, var(--purple2), var(--purple)); border-radius: 3px; }
+.segment-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px;
+  font-size: 11px; font-weight: 500;
+  background: var(--red2); color: var(--red);
+}
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 6px;
+  font-weight: 500;
+}
+.tag-purple { background: var(--purple4); color: var(--purple); }
+.tag-green { background: var(--green2); color: var(--green); }
+.tag-amber { background: var(--amber2); color: var(--amber); }
+.tag-blue { background: var(--blue2); color: var(--blue); }
+.tag-pink { background: #3d0f2a; color: var(--pink); }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.info-row:last-child { border: none; }
+.info-key { font-size: 11px; color: var(--text3); }
+.info-val { font-size: 11px; font-weight: 500; color: var(--text); text-align: right; }
+.info-val.green { color: var(--green); }
+.info-val.purple { color: var(--purple); }
+.channel-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+.ch-badge {
+  font-size: 10px; padding: 3px 8px; border-radius: 6px;
+  font-weight: 600;
+}
+.ch-ig { background: #3d0f2a; color: var(--pink); }
+.ch-wa { background: var(--green2); color: var(--green); }
+.ch-mp { background: var(--blue2); color: var(--blue); }
+.alert-card {
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  border-left: 2px solid;
+}
+.alert-card:last-child { margin-bottom: 0; }
+.alert-fire { background: #1a0800; border-color: var(--amber); color: #fde68a; }
+.alert-info { background: #0f1a2a; border-color: var(--blue); color: #bfdbfe; }
+.alert-green { background: #001a10; border-color: var(--green); color: #a7f3d0; }
+.suggested-msg {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.suggested-msg:hover { border-color: var(--purple); color: var(--text); }
+.suggested-msg::before {
+  content: '✦ IA';
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--purple);
+  display: block;
+  margin-bottom: 5px;
+}
+.use-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px;
+  background: var(--purple4);
+  border: 1px solid var(--purple3);
+  border-radius: 7px;
+  color: var(--purple);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.use-btn:hover { background: var(--purple3); }
+
+/* DASHBOARD VIEW */
+.dashboard-content { flex: 1; overflow-y: auto; padding: 24px; }
+.dash-title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.dash-sub { font-size: 12px; color: var(--text2); margin-bottom: 24px; }
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.metric-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+}
+.metric-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.metric-value { font-size: 26px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; }
+.metric-value.green { color: var(--green); }
+.metric-value.purple { color: var(--purple); }
+.metric-value.amber { color: var(--amber); }
+.metric-value.blue { color: var(--blue); }
+.metric-delta { font-size: 10px; margin-top: 6px; }
+.delta-up { color: var(--green); }
+.delta-down { color: var(--red); }
+.roi-banner {
+  background: linear-gradient(135deg, var(--purple4), var(--bg3));
+  border: 1px solid var(--purple3);
+  border-radius: var(--radius2);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.roi-main { }
+.roi-label { font-size: 11px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.roi-value { font-size: 36px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1; }
+.roi-sub { font-size: 12px; color: var(--text2); margin-top: 6px; }
+.roi-ratio { text-align: right; }
+.roi-ratio-num { font-size: 48px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--green); line-height: 1; }
+.roi-ratio-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+}
+.card-title { font-size: 12px; font-weight: 500; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+.pipeline-stage { margin-bottom: 10px; }
+.stage-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+.stage-bar { height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.stage-fill { height: 100%; border-radius: 3px; }
+.content-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+.content-item:last-child { border: none; }
+.content-name { color: var(--text2); }
+.content-stats { display: flex; gap: 12px; }
+.cs { text-align: right; }
+.cs-val { font-weight: 500; color: var(--text); }
+.cs-label { color: var(--text3); font-size: 9px; }
+.agents-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.agent-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 14px;
+}
+.agent-icon { font-size: 20px; margin-bottom: 8px; }
+.agent-name { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.agent-stat { font-size: 18px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--purple); }
+.agent-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.agent-bar { height: 3px; background: var(--bg4); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.agent-fill { height: 100%; border-radius: 2px; background: var(--purple); }
+
+/* STOCK VIEW */
+.stock-content { flex: 1; overflow-y: auto; padding: 24px; }
+.stock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.product-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+  position: relative;
+}
+.product-card.low-stock { border-color: rgba(251,191,36,0.3); }
+.product-card.no-stock { border-color: rgba(248,113,113,0.3); }
+.product-img {
+  width: 100%; height: 80px;
+  background: var(--bg3);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin-bottom: 10px;
+}
+.product-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.product-price { font-size: 16px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--green); margin-bottom: 8px; }
+.stock-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.stock-count { font-size: 11px; }
+.stock-count.ok { color: var(--green); }
+.stock-count.low { color: var(--amber); }
+.stock-count.none { color: var(--red); }
+.wishlist-count { font-size: 10px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.wl-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); }
+.stock-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 5px;
+}
+.sb-ok { background: var(--green2); color: var(--green); }
+.sb-low { background: var(--amber2); color: var(--amber); }
+.sb-none { background: var(--red2); color: var(--red); }
+
+/* CONTACTS VIEW */
+.contacts-content { flex: 1; overflow-y: auto; padding: 24px; }
+.contacts-table { width: 100%; border-collapse: collapse; }
+.contacts-table th {
+  text-align: left; padding: 8px 12px;
+  font-size: 10px; font-weight: 500;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+}
+.contacts-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.contacts-table tr:hover td { background: var(--bg2); }
+.td-name { display: flex; align-items: center; gap: 9px; }
+.score-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 20px;
+  border-radius: 5px;
+  font-size: 10px; font-weight: 600;
+  font-family: 'DM Mono', monospace;
+}
+
+/* TRIGGERS VIEW */
+.triggers-content { flex: 1; overflow-y: auto; padding: 24px; }
+.trigger-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.trigger-kw {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px; font-weight: 500;
+  color: var(--purple);
+  background: var(--purple4);
+  padding: 6px 12px; border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.trigger-info { flex: 1; }
+.trigger-response { font-size: 12px; color: var(--text2); line-height: 1.55; margin-top: 5px; }
+.trigger-stats { display: flex; gap: 12px; margin-top: 8px; }
+.tstat { font-size: 10px; color: var(--text3); }
+.tstat span { color: var(--text); font-weight: 500; }
+.trigger-toggle {
+  width: 32px; height: 18px; border-radius: 9px;
+  background: var(--purple2); cursor: pointer; position: relative;
+  flex-shrink: 0; margin-top: 2px; border: none;
+}
+.trigger-toggle::after {
+  content: ''; position: absolute;
+  right: 2px; top: 2px;
+  width: 14px; height: 14px;
+  background: white; border-radius: 50%;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* loading animation */
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+.typing-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--text3); margin: 0 1px; animation: pulse 1.2s ease infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.view-header {
+  padding: 20px 24px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.view-header-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; }
+.view-header-title { font-size: 15px; font-weight: 500; }
+.view-header-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.action-btn {
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--purple2); color: white;
+  border: none; cursor: pointer;
+  font-size: 12px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.action-btn:hover { background: #6d28d9; }
+.action-btn.secondary {
+  background: var(--bg3); color: var(--text2);
+  border: 1px solid var(--border);
+}
+.action-btn.secondary:hover { border-color: var(--border2); color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-mark">P</div>
+  <button class="nav-btn active" onclick="showView('chat')" title="Bandeja">
+    💬
+    <span class="notif"></span>
+  </button>
+  <button class="nav-btn" onclick="showView('contacts')" title="Contactos">👥</button>
+  <button class="nav-btn" onclick="showView('stock')" title="Stock">📦</button>
+  <button class="nav-btn" onclick="showView('triggers')" title="Triggers">⚡</button>
+  <button class="nav-btn" onclick="showView('dashboard')" title="Dashboard ROI">📊</button>
+  <div class="sidebar-bottom">
+    <button class="nav-btn" title="Configuración">⚙️</button>
+    <div class="avatar" style="width:32px;height:32px;font-size:11px;background:#1a0f3d;color:#a78bfa;margin-top:8px;">TN</div>
+  </div>
+</div>
+
+<!-- LEFT PANEL — CONVERSATIONS -->
+<div class="left-panel">
+  <div class="panel-header">
+    <div class="panel-title">Conversaciones</div>
+    <input class="search-box" placeholder="🔍  Buscar cliente..." />
+    <div class="filter-tabs">
+      <div class="ftab active">Todos</div>
+      <div class="ftab">🔥 Hot</div>
+      <div class="ftab">IA</div>
+    </div>
+  </div>
+  <div class="contact-list">
+
+    <div class="contact-item active" onclick="selectContact(0)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#2d1b69;color:#a78bfa;">MG</div>
+        <div class="ci-info">
+          <div class="ci-name">Marcos García <span class="tag-hot">HOT</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#f472b6;"></span>si dale, me lo reservás</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:87%;background:#a78bfa;"></div></div>
+        <span class="score-label" style="color:#a78bfa;">87</span>
+        <span class="time-label" style="margin-left:6px;">2m</span>
+      </div>
+    </div>
+
+    <div class="contact-item" onclick="selectContact(1)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#064e3b;color:#34d399;">LS</div>
+        <div class="ci-info">
+          <div class="ci-name">Laura Sánchez <span class="tag-warm">TIBIO</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#60a5fa;"></span>¿hacen envíos?</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:64%;background:#fbbf24;"></div></div>
+        <span class="score-label" style="color:#fbbf24;">64</span>
+        <span class="time-label" style="margin-left:6px;">8m</span>
+      </div>
+    </div>
+
+    <div class="contact-item" onclick="selectContact(2)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#1e3a5f;color:#60a5fa;">PR</div>
+        <div class="ci-info">
+          <div class="ci-name">Pedro Ruiz <span class="tag-warm">TIBIO</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#34d399;"></span>¿aceptan cuotas?</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:71%;background:#fbbf24;"></div></div>
+        <span class="score-label" style="color:#fbbf24;">71</span>
+        <span class="time-label" style="margin-left:6px;">15m</span>
+      </div>
+    </div>
+
+    <div class="contact-item" onclick="selectContact(3)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#1a0f3d;color:#a78bfa;">JM</div>
+        <div class="ci-info">
+          <div class="ci-name">Juan Méndez <span class="tag-hot">HOT</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#f472b6;"></span>quiero el iPhone 14</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:92%;background:#a78bfa;"></div></div>
+        <span class="score-label" style="color:#a78bfa;">92</span>
+        <span class="time-label" style="margin-left:6px;">1h</span>
+      </div>
+    </div>
+
+    <div class="contact-item" onclick="selectContact(4)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#3d0f2a;color:#f472b6;">AT</div>
+        <div class="ci-info">
+          <div class="ci-name">Ana Torres <span class="tag-cold">FRÍO</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#a78bfa;"></span>gracias por todo!</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:38%;background:#60a5fa;"></div></div>
+        <span class="score-label" style="color:#60a5fa;">38</span>
+        <span class="time-label" style="margin-left:6px;">3h</span>
+      </div>
+    </div>
+
+    <div class="contact-item" onclick="selectContact(5)">
+      <div class="ci-top">
+        <div class="avatar" style="background:#064e3b;color:#34d399;">RV</div>
+        <div class="ci-info">
+          <div class="ci-name">Rodrigo V. <span class="tag-warm">TIBIO</span></div>
+          <div class="ci-preview"><span class="ch-dot" style="background:#60a5fa;"></span>¿tienen Nike 43?</div>
+        </div>
+      </div>
+      <div class="ci-bottom">
+        <div class="score-track"><div class="score-fill" style="width:55%;background:#fbbf24;"></div></div>
+        <span class="score-label" style="color:#fbbf24;">55</span>
+        <span class="time-label" style="margin-left:6px;">5h</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN AREA -->
+<div class="main">
+
+  <!-- CHAT VIEW -->
+  <div class="main-view active" id="view-chat">
+    <div class="chat-header">
+      <div class="avatar" style="width:38px;height:38px;font-size:13px;background:#2d1b69;color:#a78bfa;">MG</div>
+      <div class="chat-header-info">
+        <div class="name">Marcos García · <span style="color:var(--text2);font-weight:400;">@marcosok92</span></div>
+        <div class="meta">
+          <span class="ch-dot" style="background:#f472b6;"></span>
+          Instagram DM
+          <span style="color:var(--text3);">·</span>
+          score <span style="color:var(--purple);font-weight:500;">87/100</span>
+          <span style="color:var(--text3);">·</span>
+          <span style="color:var(--green);">● en línea</span>
+        </div>
+      </div>
+      <div class="ai-toggle" onclick="toggleAI(this)">
+        <div class="toggle-dot" id="ai-toggle-dot"></div>
+        <span class="toggle-label" id="ai-toggle-label">IA activa</span>
+      </div>
+    </div>
+
+    <div class="messages-area" id="messages">
+      <div class="msg incoming">
+        <div class="msg-bubble">Hola! tienen el Nike Air Max en talle 42?</div>
+        <div class="msg-meta">14:32</div>
+      </div>
+      <div class="msg outgoing">
+        <div class="msg-bubble">¡Hola Marcos! Sí, tenemos el Air Max talle 42 en negro ($120) y blanco ($115). ¿Te cuento más sobre alguno? 👟</div>
+        <div class="msg-meta">14:32</div>
+        <div class="ai-indicator">✦ respondido por IA</div>
+      </div>
+      <div class="msg incoming">
+        <div class="msg-bubble">cuanto el negro? se puede en cuotas?</div>
+        <div class="msg-meta">14:35</div>
+      </div>
+      <div class="msg outgoing">
+        <div class="msg-bubble">El negro $120 — y sí, hasta 6 cuotas sin interés con Mercado Pago. ⚡ Quedan solo 2 pares en ese talle. ¿Te reservo uno?</div>
+        <div class="msg-meta">14:35</div>
+        <div class="ai-indicator">✦ respondido por IA</div>
+      </div>
+      <div class="msg incoming">
+        <div class="msg-bubble">si dale, me lo reservás</div>
+        <div class="msg-meta">14:36</div>
+      </div>
+      <div class="msg outgoing">
+        <div class="msg-bubble">¡Perfecto Marcos! 🎉 Reservado el Nike Air Max talle 42 negro. Te mando el link de pago ahora mismo.</div>
+        <div class="msg-meta">14:36</div>
+        <div class="ai-indicator">✦ venta cerrada · $120 · por IA</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <textarea class="msg-textarea" id="msg-input" placeholder="Escribir mensaje manualmente..." rows="1"></textarea>
+      <button class="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div class="main-view" id="view-dashboard">
+    <div class="view-header">
+      <div class="view-header-row">
+        <div>
+          <div class="view-header-title">Dashboard ROI</div>
+          <div class="view-header-sub">Abril 2026 — actualizado ahora mismo</div>
+        </div>
+        <button class="action-btn secondary">Exportar reporte</button>
+      </div>
+    </div>
+    <div class="dashboard-content">
+      <div class="roi-banner">
+        <div class="roi-main">
+          <div class="roi-label">Revenue generado por PulseIG</div>
+          <div class="roi-value">$4.380</div>
+          <div class="roi-sub">Tu inversión este mes: $1,000 · <span style="color:var(--green);">ganás $3,380 netos</span></div>
+        </div>
+        <div class="roi-ratio">
+          <div class="roi-ratio-num">4.3x</div>
+          <div class="roi-ratio-label">retorno sobre inversión</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Ventas por IA</div>
+          <div class="metric-value green">34</div>
+          <div class="metric-delta delta-up">↑ 28% vs semana anterior</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Carritos recuperados</div>
+          <div class="metric-value amber">12</div>
+          <div class="metric-delta delta-up">↑ $840 recuperados</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Tasa de cierre IA</div>
+          <div class="metric-value purple">34%</div>
+          <div class="metric-delta delta-up">↑ era 28% la semana pasada</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Nuevos leads</div>
+          <div class="metric-value blue">87</div>
+          <div class="metric-delta delta-up">↑ 4 canales activos</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Pipeline de ventas <span style="font-size:10px;color:var(--text3);font-weight:400;">esta semana</span></div>
+          <div class="pipeline-stage">
+            <div class="stage-header"><span>Nuevo contacto</span><span style="color:var(--text);">87</span></div>
+            <div class="stage-bar"><div class="stage-fill" style="width:100%;background:#378ADD;"></div></div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="stage-header"><span>Calificado</span><span style="color:var(--text);">54</span></div>
+            <div class="stage-bar"><div class="stage-fill" style="width:62%;background:#a78bfa;"></div></div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="stage-header"><span>Propuesta enviada</span><span style="color:var(--text);">38</span></div>
+            <div class="stage-bar"><div class="stage-fill" style="width:44%;background:#fbbf24;"></div></div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="stage-header"><span>Venta cerrada</span><span style="color:var(--green);">34</span></div>
+            <div class="stage-bar"><div class="stage-fill" style="width:39%;background:#34d399;"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Contenido que más vende</div>
+          <div class="content-item">
+            <span class="content-name">Reel Nike Air Max</span>
+            <div class="content-stats">
+              <div class="cs"><div class="cs-val">12</div><div class="cs-label">DMs</div></div>
+              <div class="cs"><div class="cs-val" style="color:var(--green);">$480</div><div class="cs-label">ventas</div></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <span class="content-name">Story iPhone 14 Pro</span>
+            <div class="content-stats">
+              <div class="cs"><div class="cs-val">9</div><div class="cs-label">DMs</div></div>
+              <div class="cs"><div class="cs-val" style="color:var(--green);">$850</div><div class="cs-label">ventas</div></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <span class="content-name">Post Adidas Samba</span>
+            <div class="content-stats">
+              <div class="cs"><div class="cs-val">3</div><div class="cs-label">DMs</div></div>
+              <div class="cs"><div class="cs-val" style="color:var(--red);">$0</div><div class="cs-label">ventas</div></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <span class="content-name">Trigger "NIKE"</span>
+            <div class="content-stats">
+              <div class="cs"><div class="cs-val">22</div><div class="cs-label">activ.</div></div>
+              <div class="cs"><div class="cs-val" style="color:var(--green);">$660</div><div class="cs-label">ventas</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Squad de agentes IA</div>
+        <div class="agents-grid" style="margin-bottom:0;">
+          <div class="agent-card">
+            <div class="agent-icon">👋</div>
+            <div class="agent-name">Recepcionista</div>
+            <div class="agent-stat">234</div>
+            <div class="agent-label">conversaciones iniciadas</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:95%;"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">💰</div>
+            <div class="agent-name">Vendedor</div>
+            <div class="agent-stat">34%</div>
+            <div class="agent-label">tasa de cierre</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:34%;background:#34d399;"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">🔄</div>
+            <div class="agent-name">Recuperador</div>
+            <div class="agent-stat">12</div>
+            <div class="agent-label">carritos recuperados</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:60%;background:#fbbf24;"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">⭐</div>
+            <div class="agent-name">Post-venta</div>
+            <div class="agent-stat">8</div>
+            <div class="agent-label">reseñas conseguidas</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:45%;background:#f472b6;"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">📊</div>
+            <div class="agent-name">Analista</div>
+            <div class="agent-stat">3</div>
+            <div class="agent-label">insights esta semana</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:100%;background:#60a5fa;"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">⚙️</div>
+            <div class="agent-name">Operador</div>
+            <div class="agent-stat">47</div>
+            <div class="agent-label">tareas ejecutadas</div>
+            <div class="agent-bar"><div class="agent-fill" style="width:78%;background:#34d399;"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONTACTS VIEW -->
+  <div class="main-view" id="view-contacts">
+    <div class="view-header">
+      <div class="view-header-row">
+        <div>
+          <div class="view-header-title">Contactos</div>
+          <div class="view-header-sub">234 contactos · 18 calientes ahora</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="action-btn secondary">Exportar CSV</button>
+          <button class="action-btn">+ Agregar</button>
+        </div>
+      </div>
+    </div>
+    <div class="contacts-content">
+      <table class="contacts-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Canales</th>
+            <th>Score</th>
+            <th>Segmento</th>
+            <th>Compras</th>
+            <th>Última interacción</th>
+            <th>Preferencias</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:#2d1b69;color:#a78bfa;">MG</div>Marcos García</div></td>
+            <td><div class="channel-badges"><span class="ch-badge ch-ig">IG</span><span class="ch-badge ch-wa">WA</span></div></td>
+            <td><span class="score-pill" style="background:#2d1b69;color:#a78bfa;">87</span></td>
+            <td><span class="tag-hot" style="font-size:10px;padding:2px 7px;">🔥 Caliente</span></td>
+            <td><span style="color:var(--green);font-weight:500;">3 · $340</span></td>
+            <td style="color:var(--text2);">hace 2 min</td>
+            <td><div class="tags-wrap" style="margin:0;"><span class="tag tag-purple">Nike</span><span class="tag tag-amber">cuotas</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:#064e3b;color:#34d399;">LS</div>Laura Sánchez</div></td>
+            <td><div class="channel-badges"><span class="ch-badge ch-mp">MP</span></div></td>
+            <td><span class="score-pill" style="background:#451a03;color:#fbbf24;">64</span></td>
+            <td><span class="tag-warm" style="font-size:10px;padding:2px 7px;">🟡 Tibio</span></td>
+            <td><span style="color:var(--green);font-weight:500;">1 · $95</span></td>
+            <td style="color:var(--text2);">hace 8 min</td>
+            <td><div class="tags-wrap" style="margin:0;"><span class="tag tag-green">precio</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:#1e3a5f;color:#60a5fa;">PR</div>Pedro Ruiz</div></td>
+            <td><div class="channel-badges"><span class="ch-badge ch-wa">WA</span></div></td>
+            <td><span class="score-pill" style="background:#451a03;color:#fbbf24;">71</span></td>
+            <td><span class="tag-warm" style="font-size:10px;padding:2px 7px;">🟡 Tibio</span></td>
+            <td><span style="color:var(--green);font-weight:500;">2 · $180</span></td>
+            <td style="color:var(--text2);">hace 15 min</td>
+            <td><div class="tags-wrap" style="margin:0;"><span class="tag tag-blue">iPhone</span><span class="tag tag-amber">cuotas</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:#1a0f3d;color:#a78bfa;">JM</div>Juan Méndez</div></td>
+            <td><div class="channel-badges"><span class="ch-badge ch-ig">IG</span></div></td>
+            <td><span class="score-pill" style="background:#2d1b69;color:#a78bfa;">92</span></td>
+            <td><span class="tag-hot" style="font-size:10px;padding:2px 7px;">🔥 Caliente</span></td>
+            <td><span style="color:var(--text2);font-weight:500;">0 · $0</span></td>
+            <td style="color:var(--text2);">hace 1h</td>
+            <td><div class="tags-wrap" style="margin:0;"><span class="tag tag-blue">iPhone</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="td-name"><div class="avatar" style="width:28px;height:28px;font-size:10px;background:#3d0f2a;color:#f472b6;">AT</div>Ana Torres</div></td>
+            <td><div class="channel-badges"><span class="ch-badge ch-ig">IG</span><span class="ch-badge ch-mp">MP</span><span class="ch-badge ch-wa">WA</span></div></td>
+            <td><span class="score-pill" style="background:#1e3a5f;color:#60a5fa;">38</span></td>
+            <td><span class="tag-cold" style="font-size:10px;padding:2px 7px;">🔵 Frío</span></td>
+            <td><span style="color:var(--green);font-weight:500;">5 · $620</span></td>
+            <td style="color:var(--text2);">hace 3h</td>
+            <td><div class="tags-wrap" style="margin:0;"><span class="tag tag-pink">VIP</span><span class="tag tag-purple">Nike</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STOCK VIEW -->
+  <div class="main-view" id="view-stock">
+    <div class="view-header">
+      <div class="view-header-row">
+        <div>
+          <div class="view-header-title">Stock y Productos</div>
+          <div class="view-header-sub">8 productos · 3 con wishlist activa</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="action-btn secondary">Importar Excel</button>
+          <button class="action-btn">+ Agregar producto</button>
+        </div>
+      </div>
+    </div>
+    <div class="stock-content">
+      <div class="stock-grid">
+        <div class="product-card">
+          <span class="stock-badge sb-ok">En stock</span>
+          <div class="product-img">👟</div>
+          <div class="product-name">Nike Air Max 42 Negro</div>
+          <div class="product-price">$120</div>
+          <div class="stock-row">
+            <span class="stock-count ok">● 3 unidades</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 0 en wishlist</div>
+        </div>
+        <div class="product-card low-stock">
+          <span class="stock-badge sb-low">Stock bajo</span>
+          <div class="product-img">👟</div>
+          <div class="product-name">Nike Air Max 42 Blanco</div>
+          <div class="product-price">$115</div>
+          <div class="stock-row">
+            <span class="stock-count low">⚠ 1 unidad</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 4 en wishlist</div>
+        </div>
+        <div class="product-card no-stock">
+          <span class="stock-badge sb-none">Sin stock</span>
+          <div class="product-img">📱</div>
+          <div class="product-name">iPhone 14 Pro 128GB Negro</div>
+          <div class="product-price">$850</div>
+          <div class="stock-row">
+            <span class="stock-count none">✕ Sin stock</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 7 esperando 🔥</div>
+        </div>
+        <div class="product-card">
+          <span class="stock-badge sb-ok">En stock</span>
+          <div class="product-img">📱</div>
+          <div class="product-name">iPhone 14 Pro 256GB Blanco</div>
+          <div class="product-price">$920</div>
+          <div class="stock-row">
+            <span class="stock-count ok">● 2 unidades</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 2 en wishlist</div>
+        </div>
+        <div class="product-card">
+          <span class="stock-badge sb-ok">En stock</span>
+          <div class="product-img">👟</div>
+          <div class="product-name">Adidas Samba 41 Negro</div>
+          <div class="product-price">$98</div>
+          <div class="stock-row">
+            <span class="stock-count ok">● 6 unidades</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 0 en wishlist</div>
+        </div>
+        <div class="product-card low-stock">
+          <span class="stock-badge sb-low">Stock bajo</span>
+          <div class="product-img">📱</div>
+          <div class="product-name">Samsung Galaxy S24</div>
+          <div class="product-price">$720</div>
+          <div class="stock-row">
+            <span class="stock-count low">⚠ 2 unidades</span>
+          </div>
+          <div class="wishlist-count"><span class="wl-dot"></span> 1 en wishlist</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIGGERS VIEW -->
+  <div class="main-view" id="view-triggers">
+    <div class="view-header">
+      <div class="view-header-row">
+        <div>
+          <div class="view-header-title">Triggers de Comentarios</div>
+          <div class="view-header-sub">Palabras clave que disparan DMs automáticos</div>
+        </div>
+        <button class="action-btn">+ Nuevo trigger</button>
+      </div>
+    </div>
+    <div class="triggers-content">
+      <div class="trigger-item">
+        <div class="trigger-kw">NIKE</div>
+        <div class="trigger-info">
+          <div style="font-size:11px;color:var(--text2);">Respuesta automática cuando alguien comenta "NIKE" en cualquier post</div>
+          <div class="trigger-response">"¡Hola! Vi que te interesó la línea Nike 👟 Te mando el catálogo completo con todos los modelos y precios disponibles ahora mismo."</div>
+          <div class="trigger-stats">
+            <div class="tstat">Activaciones: <span>22 esta semana</span></div>
+            <div class="tstat">Ventas: <span style="color:var(--green);">$660</span></div>
+            <div class="tstat">Conversión: <span>41%</span></div>
+          </div>
+        </div>
+        <button class="trigger-toggle"></button>
+      </div>
+      <div class="trigger-item">
+        <div class="trigger-kw">PRECIO</div>
+        <div class="trigger-info">
+          <div style="font-size:11px;color:var(--text2);">Cuando alguien comenta pidiendo precio</div>
+          <div class="trigger-response">"¡Hola! Te paso los precios actualizados 💰 Tenemos opciones desde $95 hasta $920. ¿Qué producto te interesa más?"</div>
+          <div class="trigger-stats">
+            <div class="tstat">Activaciones: <span>15 esta semana</span></div>
+            <div class="tstat">Ventas: <span style="color:var(--green);">$340</span></div>
+            <div class="tstat">Conversión: <span>33%</span></div>
+          </div>
+        </div>
+        <button class="trigger-toggle"></button>
+      </div>
+      <div class="trigger-item">
+        <div class="trigger-kw">INFO</div>
+        <div class="trigger-info">
+          <div style="font-size:11px;color:var(--text2);">Trigger general para cualquier consulta</div>
+          <div class="trigger-response">"¡Hola! Con gusto te ayudo. Contame, ¿qué producto estás buscando? Tenemos Nike, iPhone y mucho más con envío a todo el país 🚀"</div>
+          <div class="trigger-stats">
+            <div class="tstat">Activaciones: <span>31 esta semana</span></div>
+            <div class="tstat">Ventas: <span style="color:var(--green);">$520</span></div>
+            <div class="tstat">Conversión: <span>28%</span></div>
+          </div>
+        </div>
+        <button class="trigger-toggle"></button>
+      </div>
+      <div class="trigger-item">
+        <div class="trigger-kw">IPHONE</div>
+        <div class="trigger-info">
+          <div style="font-size:11px;color:var(--text2);">Para posts de tecnología</div>
+          <div class="trigger-response">"¡Hola! Los iPhone están disponibles 📱 Tenemos el 14 Pro en 128GB y 256GB, con garantía oficial y hasta 12 cuotas. ¿Te mando los detalles?"</div>
+          <div class="trigger-stats">
+            <div class="tstat">Activaciones: <span>9 esta semana</span></div>
+            <div class="tstat">Ventas: <span style="color:var(--green);">$1,700</span></div>
+            <div class="tstat">Conversión: <span>44%</span></div>
+          </div>
+        </div>
+        <button class="trigger-toggle"></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel" id="right-panel">
+  <div class="rp-section">
+    <div class="rp-label">Score de intención</div>
+    <div class="score-display">
+      <div class="score-num" id="rp-score">87</div>
+      <div class="score-context">/ 100</div>
+    </div>
+    <div style="font-size:11px;color:var(--amber);margin-top:4px;" id="rp-segment-text">🔥 compra inminente</div>
+    <div class="big-track"><div class="big-fill" id="rp-bar" style="width:87%;"></div></div>
+  </div>
+  <div class="rp-section">
+    <div class="rp-label">Segmento</div>
+    <div class="segment-badge" id="rp-badge">🔥 Caliente</div>
+    <div class="tags-wrap" id="rp-tags">
+      <span class="tag tag-purple">fan Nike</span>
+      <span class="tag tag-amber">prefiere cuotas</span>
+      <span class="tag tag-green">comprador frecuente</span>
+    </div>
+  </div>
+  <div class="rp-section">
+    <div class="rp-label">Datos del contacto</div>
+    <div class="info-row"><span class="info-key">Instagram</span><span class="info-val purple">@marcosok92</span></div>
+    <div class="info-row"><span class="info-key">WhatsApp</span><span class="info-val">+54 9 11 ····</span></div>
+    <div class="info-row"><span class="info-key">Ciudad</span><span class="info-val">Zárate, BA</span></div>
+    <div class="info-row"><span class="info-key">Compras</span><span class="info-val green">3 · $340</span></div>
+    <div class="info-row"><span class="info-key">Talle</span><span class="info-val">42</span></div>
+    <div class="info-row"><span class="info-key">Última compra</span><span class="info-val">hace 45 días</span></div>
+    <div class="rp-label" style="margin-top:10px;">Canales vinculados</div>
+    <div class="channel-badges">
+      <span class="ch-badge ch-ig">Instagram</span>
+      <span class="ch-badge ch-wa">WhatsApp</span>
+    </div>
+  </div>
+  <div class="rp-section">
+    <div class="rp-label">Alertas activas</div>
+    <div class="alert-card alert-fire">💰 Venta en progreso — Nike Air Max $120</div>
+    <div class="alert-card alert-info">📦 Stock bajo: 2 unidades talle 42 blanco</div>
+    <div class="alert-card alert-green">⭐ Pedir reseña después de esta compra</div>
+  </div>
+  <div class="rp-section">
+    <div class="rp-label">Mensaje sugerido por IA</div>
+    <div class="suggested-msg" id="suggested-msg">
+      "Marcos, ya que compraste Nike hoy, tenemos también los nuevos Jordan que justo llegaron en tu talle. ¿Te mando fotos?"
+    </div>
+    <button class="use-btn" onclick="useSuggested()">Usar este mensaje ↗</button>
+  </div>
+</div>
+
+<script>
+const contacts = [
+  {
+    name: 'Marcos García', handle: '@marcosok92', score: 87, channel: 'Instagram DM', channelColor: '#f472b6',
+    segment: '🔥 Caliente', segmentText: '🔥 compra inminente', badgeBg: 'var(--red2)', badgeColor: 'var(--red)',
+    barColor: '#a78bfa', tags: ['fan Nike','prefiere cuotas','comprador frecuente'],
+    tagClasses: ['tag-purple','tag-amber','tag-green'],
+    ig: '@marcosok92', wa: '+54 9 11 ····', city: 'Zárate, BA', sales: '3 · $340', size: '42', lastBuy: 'hace 45 días',
+    channels: ['Instagram','WhatsApp'], channelClasses: ['ch-ig','ch-wa'],
+    alerts: [
+      {type:'alert-fire', text:'💰 Venta en progreso — Nike Air Max $120'},
+      {type:'alert-info', text:'📦 Stock bajo: 2 unidades talle 42 blanco'},
+      {type:'alert-green', text:'⭐ Pedir reseña después de esta compra'}
+    ],
+    suggestion: '"Marcos, ya que compraste Nike hoy, tenemos también los nuevos Jordan que llegaron en tu talle. ¿Te mando fotos?"'
+  },
+  {
+    name: 'Laura Sánchez', handle: 'Marketplace', score: 64, channel: 'Facebook Marketplace', channelColor: '#60a5fa',
+    segment: '🟡 Tibio', segmentText: '🟡 interesado, no decidido', badgeBg: 'var(--amber2)', badgeColor: 'var(--amber)',
+    barColor: '#fbbf24', tags: ['sensible al precio','primera compra'],
+    tagClasses: ['tag-green','tag-blue'],
+    ig: '—', wa: '—', city: 'Buenos Aires', sales: '1 · $95', size: '—', lastBuy: 'hace 8 min',
+    channels: ['Marketplace'], channelClasses: ['ch-mp'],
+    alerts: [
+      {type:'alert-info', text:'📍 Primer contacto por Marketplace'},
+      {type:'alert-fire', text:'💡 Preguntó por envíos — ofrecer MercadoEnvíos'}
+    ],
+    suggestion: '"Hola Laura, sí hacemos envíos a todo el país con MercadoEnvíos 📦 ¿A qué provincia sería? Te calculo el costo ahora."'
+  },
+  {
+    name: 'Pedro Ruiz', handle: 'WhatsApp', score: 71, channel: 'WhatsApp', channelColor: '#34d399',
+    segment: '🟡 Tibio', segmentText: '🟡 interesado en iPhone', badgeBg: 'var(--amber2)', badgeColor: 'var(--amber)',
+    barColor: '#fbbf24', tags: ['fan iPhone','prefiere cuotas'],
+    tagClasses: ['tag-blue','tag-amber'],
+    ig: '—', wa: '+54 9 11 ····', city: 'Córdoba', sales: '2 · $180', size: '—', lastBuy: 'hace 15 min',
+    channels: ['WhatsApp'], channelClasses: ['ch-wa'],
+    alerts: [
+      {type:'alert-fire', text:'📱 Interesado en iPhone 14 Pro'},
+      {type:'alert-info', text:'💳 Siempre pregunta cuotas — mencionar 12 cuotas'}
+    ],
+    suggestion: '"Pedro, el iPhone 14 Pro lo tenemos en 12 cuotas sin interés con Mercado Pago. El 128GB queda en ~$71/mes. ¿Arrancamos?"'
+  },
+  {
+    name: 'Juan Méndez', handle: '@juanm_ok', score: 92, channel: 'Instagram DM', channelColor: '#f472b6',
+    segment: '🔥 Caliente', segmentText: '🔥 compra inminente — actuar ya', badgeBg: 'var(--red2)', badgeColor: 'var(--red)',
+    barColor: '#a78bfa', tags: ['fan iPhone','comprador nuevo'],
+    tagClasses: ['tag-blue','tag-green'],
+    ig: '@juanm_ok', wa: '—', city: 'Rosario', sales: '0 · $0', size: '—', lastBuy: '—',
+    channels: ['Instagram'], channelClasses: ['ch-ig'],
+    alerts: [
+      {type:'alert-fire', text:'🔥 Score 92 — nunca compró, gran oportunidad'},
+      {type:'alert-info', text:'📱 Buscó iPhone 14 Pro — sin stock 128GB negro'}
+    ],
+    suggestion: '"Juan, el iPhone 14 Pro 256GB está disponible ahora. Tenemos 2 unidades. ¿Te lo reservo antes de que se agote?"'
+  },
+  {
+    name: 'Ana Torres', handle: '@anatorres', score: 38, channel: 'Messenger', channelColor: '#a78bfa',
+    segment: '🔵 Frío', segmentText: '🔵 cliente VIP inactivo 60 días', badgeBg: 'var(--blue2)', badgeColor: 'var(--blue)',
+    barColor: '#60a5fa', tags: ['cliente VIP','fan Nike','compradora frecuente'],
+    tagClasses: ['tag-pink','tag-purple','tag-green'],
+    ig: '@anatorres', wa: '+54 9 11 ····', city: 'Mendoza', sales: '5 · $620', size: '38', lastBuy: 'hace 62 días',
+    channels: ['Instagram','Marketplace','WhatsApp'], channelClasses: ['ch-ig','ch-mp','ch-wa'],
+    alerts: [
+      {type:'alert-fire', text:'⚠ VIP inactiva 62 días — re-engagement urgente'},
+      {type:'alert-green', text:'🎁 Su cumpleaños es en 12 días — ofrecer descuento'}
+    ],
+    suggestion: '"Ana! Te extrañamos 🌟 Llegaron los nuevos Nike en tu talle 38. Como cliente VIP tenés 15% off esta semana. ¿Te mando fotos?"'
+  },
+  {
+    name: 'Rodrigo V.', handle: '@rodriV92', score: 55, channel: 'Marketplace', channelColor: '#60a5fa',
+    segment: '🟡 Tibio', segmentText: '🟡 buscando Nike talle 43', badgeBg: 'var(--amber2)', badgeColor: 'var(--amber)',
+    barColor: '#fbbf24', tags: ['fan Nike','talle 43'],
+    tagClasses: ['tag-purple','tag-blue'],
+    ig: '—', wa: '—', city: 'La Plata', sales: '0 · $0', size: '43', lastBuy: '—',
+    channels: ['Marketplace'], channelClasses: ['ch-mp'],
+    alerts: [
+      {type:'alert-info', text:'👟 Buscó Nike talle 43 — sin stock aún'},
+      {type:'alert-green', text:'✅ Agregado a wishlist Nike 43'}
+    ],
+    suggestion: '"Rodrigo, no tenemos Nike en 43 ahora pero te anoto en lista de espera. ¿Te aviso cuando llegue? Suelen durar poco 🔥"'
+  }
+];
+
+let currentContact = 0;
+let aiActive = true;
+let currentView = 'chat';
+
+function selectContact(idx) {
+  currentContact = idx;
+  document.querySelectorAll('.contact-item').forEach((el,i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  const c = contacts[idx];
+  document.getElementById('rp-score').textContent = c.score;
+  document.getElementById('rp-segment-text').textContent = c.segmentText;
+  document.getElementById('rp-bar').style.width = c.score + '%';
+  document.getElementById('rp-bar').style.background = c.barColor;
+  document.getElementById('rp-badge').textContent = c.segment;
+  document.getElementById('rp-badge').style.background = c.badgeBg;
+  document.getElementById('rp-badge').style.color = c.badgeColor;
+  const tagsEl = document.getElementById('rp-tags');
+  tagsEl.innerHTML = c.tags.map((t,i) => `<span class="tag ${c.tagClasses[i]}">${t}</span>`).join('');
+  document.getElementById('suggested-msg').innerHTML = c.suggestion;
+  const alerts = document.querySelector('.rp-section:nth-child(4)');
+  alerts.innerHTML = '<div class="rp-label">Alertas activas</div>' +
+    c.alerts.map(a => `<div class="alert-card ${a.type}">${a.text}</div>`).join('');
+  const header = document.querySelector('.chat-header-info .name');
+  header.innerHTML = `${c.name} · <span style="color:var(--text2);font-weight:400;">${c.handle}</span>`;
+  const meta = document.querySelector('.chat-header-info .meta');
+  meta.innerHTML = `<span class="ch-dot" style="background:${c.channelColor};"></span> ${c.channel} <span style="color:var(--text3);">·</span> score <span style="color:var(--purple);font-weight:500;">${c.score}/100</span>`;
+}
+
+function toggleAI(el) {
+  aiActive = !aiActive;
+  const dot = document.getElementById('ai-toggle-dot');
+  const label = document.getElementById('ai-toggle-label');
+  dot.classList.toggle('off', !aiActive);
+  label.textContent = aiActive ? 'IA activa' : 'IA pausada';
+  label.style.color = aiActive ? 'var(--text2)' : 'var(--red)';
+}
+
+function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const messages = document.getElementById('messages');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'msg outgoing';
+  msgDiv.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-meta">ahora</div>`;
+  messages.appendChild(msgDiv);
+  input.value = '';
+  messages.scrollTop = messages.scrollHeight;
+  if (aiActive) {
+    setTimeout(() => {
+      const typing = document.createElement('div');
+      typing.className = 'msg incoming';
+      typing.innerHTML = `<div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+      typing.id = 'typing';
+      messages.appendChild(typing);
+      messages.scrollTop = messages.scrollHeight;
+      setTimeout(() => {
+        const t = document.getElementById('typing');
+        if(t) t.remove();
+        const r = document.createElement('div');
+        r.className = 'msg incoming';
+        r.innerHTML = `<div class="msg-bubble">Entendido, enseguida te respondo con más información 👍</div><div class="msg-meta">ahora</div>`;
+        messages.appendChild(r);
+        messages.scrollTop = messages.scrollHeight;
+      }, 1800);
+    }, 600);
+  }
+}
+
+function useSuggested() {
+  const sugg = document.getElementById('suggested-msg').textContent.replace(/^"|"$/g,'');
+  document.getElementById('msg-input').value = sugg;
+  document.getElementById('msg-input').focus();
+}
+
+function showView(view) {
+  currentView = view;
+  document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+  });
+  const views = ['chat','contacts','stock','triggers','dashboard'];
+  const idx = views.indexOf(view);
+  if(idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  const rightPanel = document.getElementById('right-panel');
+  rightPanel.style.display = view === 'chat' ? 'flex' : 'none';
+}
+
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+</script>
+</body>
+</html>

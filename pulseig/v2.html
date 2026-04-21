@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseIG</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#FAFAFA;--surface:#FFFFFF;--surface2:#F5F5F5;--surface3:#F0F0F0;
+  --border:#E5E5E5;--border2:#D4D4D4;
+  --text:#0A0A0A;--text2:#525252;--text3:#A3A3A3;--text4:#D4D4D4;
+  --accent:#0F172A;--accent2:#1E293B;
+  --green:#16A34A;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-border:#FDE68A;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-border:#FECACA;
+  --blue:#2563EB;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+  --purple:#7C3AED;--purple-bg:#F5F3FF;--purple-border:#DDD6FE;
+  --r:8px;--r2:12px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:13px;-webkit-font-smoothing:antialiased;}
+/* TOPBAR */
+.topbar{height:48px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:0;flex-shrink:0;z-index:20;}
+.topbar-left{display:flex;align-items:center;gap:12px;width:220px;}
+.logo{width:24px;height:24px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:-0.3px;flex-shrink:0;}
+.logo-name{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-0.3px;}
+.topbar-divider{width:1px;height:20px;background:var(--border);margin:0 8px;}
+.biz-selector{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;cursor:pointer;transition:background 0.1s;}
+.biz-selector:hover{background:var(--surface2);}
+.biz-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.biz-name{font-size:12px;font-weight:500;color:var(--text);}
+.biz-caret{font-size:10px;color:var(--text3);}
+.topbar-nav{display:flex;align-items:center;gap:1px;flex:1;padding:0 16px;}
+.tnav{padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;transition:all 0.1s;border:none;background:transparent;}
+.tnav:hover{color:var(--text);background:var(--surface2);}
+.tnav.active{color:var(--text);background:var(--surface2);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.period-btn{font-size:11px;font-weight:500;color:var(--text2);padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;}
+.notif-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;font-size:14px;position:relative;}
+.notif-btn:hover{background:var(--surface2);}
+.notif-pip{position:absolute;top:4px;right:4px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1.5px solid var(--surface);}
+.avatar-sm{width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;cursor:pointer;}
+/* BODY */
+.body{display:flex;flex:1;overflow:hidden;}
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.sidebar-section{padding:8px 8px 4px;}
+.sidebar-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;padding:4px 8px;margin-bottom:2px;}
+.slink{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:all 0.1s;color:var(--text2);font-size:12px;font-weight:500;border:none;background:transparent;width:100%;text-align:left;}
+.slink:hover{background:var(--surface2);color:var(--text);}
+.slink.active{background:var(--surface2);color:var(--text);}
+.slink-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.slink-badge{margin-left:auto;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;}
+.badge-red{background:var(--red-bg);color:var(--red);}
+.badge-green{background:var(--green-bg);color:var(--green);}
+.badge-gray{background:var(--surface2);color:var(--text3);}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 0;}
+.sidebar-bottom{margin-top:auto;padding:8px;}
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden;}
+/* VIEWS */
+.view{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.view.active{display:flex;}
+/* INBOX VIEW */
+.inbox-layout{display:flex;flex:1;overflow:hidden;}
+.inbox-list{width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.inbox-header{padding:12px 14px;border-bottom:1px solid var(--border);}
+.inbox-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.inbox-search{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);outline:none;}
+.inbox-search:focus{border-color:var(--border2);background:var(--surface);}
+.inbox-filters{display:flex;gap:4px;margin-top:8px;}
+.ifilter{padding:4px 8px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text3);transition:all 0.1s;}
+.ifilter.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.inbox-items{overflow-y:auto;flex:1;}
+.inbox-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;position:relative;}
+.inbox-item:hover{background:var(--surface2);}
+.inbox-item.active{background:var(--blue-bg);}
+.inbox-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);}
+.ii-row1{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.ii-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.ii-name{font-size:12px;font-weight:500;color:var(--text);flex:1;}
+.ii-time{font-size:10px;color:var(--text3);}
+.ii-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:36px;margin-bottom:5px;}
+.ii-row3{display:flex;align-items:center;gap:6px;padding-left:36px;}
+.score-track{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
+.score-fill{height:100%;border-radius:1px;}
+.score-num{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.ch-pill{font-size:9px;font-weight:600;padding:1px 5px;border-radius:4px;}
+.ch-ig{background:#FDF2F8;color:#9D174D;}
+.ch-mp{background:var(--blue-bg);color:#1D4ED8;}
+.ch-wa{background:var(--green-bg);color:#166534;}
+.ch-ms{background:var(--purple-bg);color:#5B21B6;}
+.seg-hot{background:var(--red-bg);color:var(--red);font-size:9px;font-weight:600;padding:1px 5px;border-radius:4px;}
+.seg-warm{background:var(--amber-bg);color:var(--amber);font-size:9px;font-weight:600;padding:1px 5px;border-radius:4px;}
+.seg-cold{background:var(--blue-bg);color:var(--blue);font-size:9px;font-weight:600;padding:1px 5px;border-radius:4px;}
+/* CHAT */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chat-header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);flex-shrink:0;}
+.chat-header-info{flex:1;}
+.ch-name{font-size:13px;font-weight:600;color:var(--text);}
+.ch-meta{font-size:11px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:8px;}
+.online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;}
+.ai-toggle-wrap{display:flex;align-items:center;gap:8px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--surface);}
+.toggle-switch{width:30px;height:16px;background:var(--blue);border-radius:8px;position:relative;transition:background 0.2s;}
+.toggle-switch.off{background:var(--border2);}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:16px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;}
+.toggle-switch.off::after{left:2px;}
+.toggle-text{font-size:11px;font-weight:500;color:var(--text2);}
+.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:68%;}
+.msg.in{align-self:flex-start;}
+.msg.out{align-self:flex-end;}
+.msg-bubble{padding:9px 13px;border-radius:10px;font-size:12px;line-height:1.6;}
+.msg.in .msg-bubble{background:var(--surface2);color:var(--text);border-bottom-left-radius:3px;}
+.msg.out .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:3px;}
+.msg-foot{display:flex;align-items:center;gap:6px;margin-top:3px;padding:0 2px;}
+.msg-time{font-size:10px;color:var(--text3);}
+.msg.out .msg-foot{justify-content:flex-end;}
+.ai-tag{font-size:9px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:1px 5px;border-radius:3px;}
+.sale-tag{font-size:9px;font-weight:600;color:var(--green);background:var(--green-bg);padding:1px 5px;border-radius:3px;}
+.input-wrap{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;}
+.msg-input{flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface2);color:var(--text);outline:none;resize:none;max-height:90px;line-height:1.5;}
+.msg-input:focus{border-color:var(--border2);background:var(--surface);}
+.send-btn{width:36px;height:36px;background:var(--accent);border:none;border-radius:7px;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.1s;}
+.send-btn:hover{opacity:0.85;}
+/* PROFILE PANEL */
+.profile-panel{width:240px;border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0;}
+.pp-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+.pp-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
+.score-big{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:400;color:var(--text);line-height:1;}
+.score-ctx{font-size:11px;color:var(--text3);margin-top:3px;}
+.score-big-track{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden;}
+.score-big-fill{height:100%;border-radius:2px;}
+.pp-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.pp-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;}
+.tag-blue{background:var(--blue-bg);color:#1D4ED8;}
+.tag-amber{background:var(--amber-bg);color:#92400E;}
+.tag-green{background:var(--green-bg);color:#166534;}
+.tag-purple{background:var(--purple-bg);color:#5B21B6;}
+.tag-red{background:var(--red-bg);color:#991B1B;}
+.info-line{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.info-line:last-child{border:none;}
+.info-k{font-size:11px;color:var(--text3);}
+.info-v{font-size:11px;font-weight:500;color:var(--text);}
+.info-v.green{color:var(--green);}
+.info-v.blue{color:var(--blue);}
+.ch-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.alert-item{padding:8px 10px;border-radius:6px;font-size:11px;line-height:1.5;margin-bottom:6px;border-left:2px solid;}
+.alert-item:last-child{margin:0;}
+.a-fire{background:var(--amber-bg);border-color:var(--amber);color:#78350F;}
+.a-info{background:var(--blue-bg);border-color:var(--blue);color:#1E40AF;}
+.a-good{background:var(--green-bg);border-color:var(--green);color:#14532D;}
+.suggestion-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;line-height:1.65;color:var(--text2);cursor:pointer;transition:border-color 0.1s;}
+.suggestion-box:hover{border-color:var(--border2);}
+.suggestion-eyebrow{font-size:9px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
+.use-suggestion{margin-top:8px;width:100%;padding:5px;background:var(--surface);border:1px solid var(--border);border-radius:5px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.1s;}
+.use-suggestion:hover{border-color:var(--border2);color:var(--text);}
+/* DASHBOARD VIEW */
+.dash-layout{flex:1;overflow-y:auto;padding:24px;}
+.dash-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.dash-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.4px;}
+.dash-sub{font-size:12px;color:var(--text3);margin-top:3px;}
+.roi-banner{background:var(--accent);border-radius:var(--r2);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.roi-eyebrow{font-size:10px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.roi-amount{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:300;color:#fff;letter-spacing:-1px;line-height:1;}
+.roi-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;}
+.roi-sub strong{color:#6EE7B7;}
+.roi-mult{font-family:'JetBrains Mono',monospace;font-size:46px;font-weight:300;color:#6EE7B7;letter-spacing:-2px;line-height:1;text-align:right;}
+.roi-mult-label{font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;text-align:right;}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.mc-label{font-size:10px;font-weight:500;color:var(--text3);margin-bottom:8px;}
+.mc-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:400;color:var(--text);line-height:1;letter-spacing:-0.5px;}
+.mc-val.green{color:var(--green);}
+.mc-val.blue{color:var(--blue);}
+.mc-val.amber{color:var(--amber);}
+.mc-delta{font-size:10px;color:var(--text3);margin-top:5px;}
+.mc-delta.up{color:var(--green);}
+.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;}
+.dcard-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.dcard-sub{font-size:10px;font-weight:400;color:var(--text3);}
+.pipe-item{margin-bottom:10px;}
+.pipe-head{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.pipe-n{font-weight:600;color:var(--text);}
+.pipe-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.pipe-fill{height:100%;border-radius:2px;}
+.citem{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.citem:last-child{border:none;padding-bottom:0;}
+.citem-name{color:var(--text2);font-weight:500;}
+.cbadge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:5px;}
+.cstats{display:flex;gap:12px;}
+.cstat-val{font-weight:600;color:var(--text);font-size:12px;}
+.cstat-val.green{color:var(--green);}
+.cstat-val.red{color:var(--red);}
+.cstat-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+.agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.agcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;}
+.ag-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ag-name{font-size:11px;font-weight:600;color:var(--text);}
+.ag-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+.ag-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:400;color:var(--text);line-height:1;}
+.ag-lbl{font-size:10px;color:var(--text3);margin-top:2px;margin-bottom:7px;}
+.ag-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.ag-fill{height:100%;border-radius:2px;}
+.insight-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:14px;}
+.insight-i{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.insight-t{flex:1;font-size:11px;color:var(--text2);line-height:1.6;}
+.insight-t strong{color:var(--text);font-weight:600;}
+.insight-btn{font-size:11px;font-weight:500;color:var(--blue);padding:5px 12px;border:1px solid var(--blue-border);border-radius:5px;cursor:pointer;background:var(--blue-bg);white-space:nowrap;}
+/* CONTACTS VIEW */
+.contacts-layout{flex:1;overflow-y:auto;padding:24px;}
+.page-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.page-title-row{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.3px;}
+.page-sub-row{font-size:11px;color:var(--text3);margin-top:2px;}
+.btns-row{display:flex;gap:6px;}
+.btn-sec{font-size:12px;font-weight:500;color:var(--text2);padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-pri{font-size:12px;font-weight:500;color:#fff;padding:6px 12px;border:none;border-radius:6px;background:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;}
+.ctable{width:100%;border-collapse:collapse;}
+.ctable th{text-align:left;padding:8px 12px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--border);background:var(--surface);}
+.ctable td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ctable tr:hover td{background:var(--surface2);}
+.td-name-cell{display:flex;align-items:center;gap:8px;}
+.tav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;}
+.td-name-text{font-size:12px;font-weight:500;color:var(--text);}
+.td-handle{font-size:10px;color:var(--text3);}
+/* STOCK VIEW */
+.stock-layout{flex:1;overflow-y:auto;padding:24px;}
+.stock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;position:relative;transition:border-color 0.1s;}
+.pcard:hover{border-color:var(--border2);}
+.pcard.low{border-color:var(--amber-border);}
+.pcard.none{border-color:var(--red-border);}
+.pcard-img{height:64px;background:var(--surface2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;}
+.pcard-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.pcard-price{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:400;color:var(--green);margin-bottom:10px;}
+.pcard-stock{font-size:11px;font-weight:500;margin-bottom:4px;}
+.pcard-stock.ok{color:var(--green);}
+.pcard-stock.low{color:var(--amber);}
+.pcard-stock.none{color:var(--red);}
+.pcard-wl{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.pcard-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;}
+.pbg-ok{background:var(--green-bg);color:#166534;}
+.pbg-low{background:var(--amber-bg);color:#92400E;}
+.pbg-none{background:var(--red-bg);color:#991B1B;}
+/* TRIGGERS VIEW */
+.triggers-layout{flex:1;overflow-y:auto;padding:24px;}
+.trig-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:14px;transition:border-color 0.1s;}
+.trig-item:hover{border-color:var(--border2);}
+.trig-kw{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--accent);background:var(--surface2);border:1px solid var(--border);padding:5px 10px;border-radius:6px;white-space:nowrap;flex-shrink:0;letter-spacing:0.05em;}
+.trig-body{flex:1;}
+.trig-desc{font-size:11px;color:var(--text3);margin-bottom:5px;}
+.trig-msg{font-size:12px;color:var(--text2);line-height:1.6;background:var(--surface2);border-radius:6px;padding:8px 10px;margin-bottom:8px;}
+.trig-stats{display:flex;gap:14px;}
+.tstat{font-size:10px;color:var(--text3);}
+.tstat span{color:var(--text);font-weight:600;}
+.tstat span.green{color:var(--green);}
+.trig-toggle-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.trig-toggle{width:32px;height:18px;border-radius:9px;background:var(--blue);border:none;cursor:pointer;position:relative;}
+.trig-toggle::after{content:'';position:absolute;right:2px;top:2px;width:14px;height:14px;background:#fff;border-radius:50%;}
+.trig-on-label{font-size:9px;font-weight:600;color:var(--blue);}
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text4);}
+/* typing */
+@keyframes blink{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.tdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--text3);margin:0 1px;animation:blink 1.2s ease infinite;}
+.tdot:nth-child(2){animation-delay:0.2s;}
+.tdot:nth-child(3){animation-delay:0.4s;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">P</div>
+    <span class="logo-name">PulseIG</span>
+    <div class="topbar-divider"></div>
+    <div class="biz-selector">
+      <div class="biz-dot"></div>
+      <span class="biz-name">Zapatería Urbana</span>
+      <span class="biz-caret">▾</span>
+    </div>
+  </div>
+  <div class="topbar-nav">
+    <button class="tnav active" onclick="switchView('inbox')">Bandeja</button>
+    <button class="tnav" onclick="switchView('contacts')">Contactos</button>
+    <button class="tnav" onclick="switchView('stock')">Stock</button>
+    <button class="tnav" onclick="switchView('triggers')">Triggers</button>
+    <button class="tnav" onclick="switchView('dashboard')">Dashboard</button>
+  </div>
+  <div class="topbar-right">
+    <div class="period-btn">Abril 2026 ▾</div>
+    <button class="notif-btn">🔔<span class="notif-pip"></span></button>
+    <div class="avatar-sm">TN</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Conversaciones</div>
+    <button class="slink active" onclick="switchView('inbox')">
+      <span class="slink-icon">💬</span> Todas
+      <span class="slink-badge badge-red">12</span>
+    </button>
+    <button class="slink" onclick="switchView('inbox');filterSeg('hot')">
+      <span class="slink-icon">🔥</span> Calientes
+      <span class="slink-badge badge-red">5</span>
+    </button>
+    <button class="slink">
+      <span class="slink-icon">🤖</span> Gestionadas por IA
+      <span class="slink-badge badge-gray">28</span>
+    </button>
+    <button class="slink">
+      <span class="slink-icon">⏳</span> Sin responder
+      <span class="slink-badge badge-red">3</span>
+    </button>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Campañas</div>
+    <button class="slink">
+      <span class="slink-icon">🔄</span> Re-engagement
+    </button>
+    <button class="slink">
+      <span class="slink-icon">🛒</span> Carritos abandonados
+      <span class="slink-badge badge-red">4</span>
+    </button>
+    <button class="slink">
+      <span class="slink-icon">⭐</span> Post-venta
+    </button>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Sistema</div>
+    <button class="slink" onclick="switchView('stock')">
+      <span class="slink-icon">📦</span> Stock
+    </button>
+    <button class="slink" onclick="switchView('triggers')">
+      <span class="slink-icon">⚡</span> Triggers
+    </button>
+    <button class="slink" onclick="switchView('dashboard')">
+      <span class="slink-icon">📊</span> ROI Dashboard
+    </button>
+  </div>
+  <div class="sidebar-bottom">
+    <button class="slink">
+      <span class="slink-icon">⚙️</span> Configuración
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- INBOX VIEW -->
+<div class="view active" id="view-inbox">
+  <div class="inbox-layout">
+    <div class="inbox-list">
+      <div class="inbox-header">
+        <div class="inbox-title">
+          Conversaciones
+          <span class="slink-badge badge-red" style="font-size:11px;">12</span>
+        </div>
+        <input class="inbox-search" placeholder="Buscar..." />
+        <div class="inbox-filters">
+          <div class="ifilter active">Todos</div>
+          <div class="ifilter">Hot</div>
+          <div class="ifilter">IA</div>
+        </div>
+      </div>
+      <div class="inbox-items">
+        <!-- contacts rendered by JS -->
+      </div>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat-header">
+        <div class="ii-avatar" id="chat-av" style="width:34px;height:34px;font-size:12px;background:#EFF6FF;color:#1D4ED8;">MG</div>
+        <div class="chat-header-info">
+          <div class="ch-name" id="chat-name">Marcos García · <span style="font-weight:400;color:var(--text3);">@marcosok92</span></div>
+          <div class="ch-meta">
+            <span class="online-dot"></span> en línea
+            <span>·</span>
+            <span class="ch-pill ch-ig">Instagram</span>
+            <span>·</span>
+            score <strong id="chat-score" style="color:var(--blue);">87</strong>/100
+          </div>
+        </div>
+        <div class="ai-toggle-wrap" onclick="toggleAI(this)">
+          <div class="toggle-switch" id="ai-sw"></div>
+          <span class="toggle-text" id="ai-label">IA activa</span>
+        </div>
+      </div>
+      <div class="messages" id="messages">
+        <div class="msg in"><div class="msg-bubble">Hola! tienen el Nike Air Max en talle 42?</div><div class="msg-foot"><span class="msg-time">14:32</span></div></div>
+        <div class="msg out"><div class="msg-bubble">¡Hola Marcos! Sí, tenemos el Air Max talle 42 en negro ($120) y blanco ($115). ¿Cuál te interesa más? 👟</div><div class="msg-foot"><span class="msg-time">14:32</span><span class="ai-tag">IA</span></div></div>
+        <div class="msg in"><div class="msg-bubble">cuanto el negro? acepta cuotas?</div><div class="msg-foot"><span class="msg-time">14:35</span></div></div>
+        <div class="msg out"><div class="msg-bubble">El negro $120. Y sí — hasta 6 cuotas sin interés con Mercado Pago. Quedan solo 2 pares en ese talle. ¿Te lo reservo?</div><div class="msg-foot"><span class="msg-time">14:35</span><span class="ai-tag">IA</span></div></div>
+        <div class="msg in"><div class="msg-bubble">si dale, reservame uno</div><div class="msg-foot"><span class="msg-time">14:36</span></div></div>
+        <div class="msg out"><div class="msg-bubble">Listo Marcos, reservado el Nike Air Max talle 42 negro. Te mando el link de pago ahora.</div><div class="msg-foot"><span class="msg-time">14:36</span><span class="ai-tag">IA</span><span class="sale-tag">Venta $120</span></div></div>
+      </div>
+      <div class="input-wrap">
+        <textarea class="msg-input" id="msg-in" placeholder="Mensaje manual..." rows="1"></textarea>
+        <button class="send-btn" onclick="sendMsg()">↑</button>
+      </div>
+    </div>
+
+    <div class="profile-panel">
+      <div class="pp-section">
+        <div class="pp-label">Score de intención</div>
+        <div class="score-big" id="pp-score">87</div>
+        <div class="score-ctx" id="pp-ctx">🔥 compra inminente</div>
+        <div class="score-big-track"><div class="score-big-fill" id="pp-bar" style="width:87%;background:#2563EB;"></div></div>
+      </div>
+      <div class="pp-section">
+        <div class="pp-label">Segmento</div>
+        <span id="pp-seg" class="seg-hot">HOT — Caliente</span>
+        <div class="pp-tags" id="pp-tags">
+          <span class="pp-tag tag-blue">fan Nike</span>
+          <span class="pp-tag tag-amber">prefiere cuotas</span>
+          <span class="pp-tag tag-green">frecuente</span>
+        </div>
+      </div>
+      <div class="pp-section">
+        <div class="pp-label">Datos</div>
+        <div class="info-line"><span class="info-k">Instagram</span><span class="info-v blue">@marcosok92</span></div>
+        <div class="info-line"><span class="info-k">WhatsApp</span><span class="info-v">+54 9 11 ····</span></div>
+        <div class="info-line"><span class="info-k">Ciudad</span><span class="info-v">Zárate, BA</span></div>
+        <div class="info-line"><span class="info-k">Compras</span><span class="info-v green">3 · $340</span></div>
+        <div class="info-line"><span class="info-k">Talle</span><span class="info-v">42</span></div>
+        <div class="pp-label" style="margin-top:10px;">Canales</div>
+        <div class="ch-chips" id="pp-channels">
+          <span class="ch-pill ch-ig">Instagram</span>
+          <span class="ch-pill ch-wa">WhatsApp</span>
+        </div>
+      </div>
+      <div class="pp-section">
+        <div class="pp-label">Alertas</div>
+        <div id="pp-alerts">
+          <div class="alert-item a-fire">💰 Venta en progreso — Nike $120</div>
+          <div class="alert-item a-info">📦 Stock bajo: 2 pares talle 42</div>
+          <div class="alert-item a-good">⭐ Pedir reseña post-compra</div>
+        </div>
+      </div>
+      <div class="pp-section">
+        <div class="pp-label">Sugerencia de IA</div>
+        <div class="suggestion-box">
+          <div class="suggestion-eyebrow">Agente vendedor</div>
+          <span id="pp-suggestion">"Marcos, ya que te llevás las Nike, tenemos los nuevos Jordan en tu talle que llegaron ayer. ¿Te mando fotos?"</span>
+        </div>
+        <button class="use-suggestion" onclick="useSugg()">Usar este mensaje →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div class="view" id="view-dashboard">
+  <div class="dash-layout">
+    <div class="dash-head">
+      <div>
+        <div class="dash-title">ROI Dashboard</div>
+        <div class="dash-sub">Abril 2026 · actualizado hace 4 minutos · 4 canales activos</div>
+      </div>
+      <button class="btn-sec">Exportar PDF ↗</button>
+    </div>
+
+    <div class="roi-banner">
+      <div>
+        <div class="roi-eyebrow">Revenue generado por PulseIG este mes</div>
+        <div class="roi-amount">$4.380</div>
+        <div class="roi-sub">Inversión: $1,000 · <strong>ganás $3,380 netos</strong></div>
+      </div>
+      <div>
+        <div class="roi-mult">4.3x</div>
+        <div class="roi-mult-label">retorno sobre inversión</div>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="mc"><div class="mc-label">Ventas por IA</div><div class="mc-val green">34</div><div class="mc-delta up">↑ 28% vs semana anterior</div></div>
+      <div class="mc"><div class="mc-label">Carritos recuperados</div><div class="mc-val amber">12</div><div class="mc-delta up">↑ $840 recuperados</div></div>
+      <div class="mc"><div class="mc-label">Tasa de cierre</div><div class="mc-val blue">34%</div><div class="mc-delta up">↑ era 28% antes</div></div>
+      <div class="mc"><div class="mc-label">Nuevos leads</div><div class="mc-val">87</div><div class="mc-delta">4 canales activos</div></div>
+    </div>
+
+    <div class="two-cols">
+      <div class="dcard">
+        <div class="dcard-title">Pipeline de ventas <span class="dcard-sub">esta semana</span></div>
+        <div class="pipe-item"><div class="pipe-head"><span>Nuevo contacto</span><span class="pipe-n">87</span></div><div class="pipe-track"><div class="pipe-fill" style="width:100%;background:#93C5FD;"></div></div></div>
+        <div class="pipe-item"><div class="pipe-head"><span>Calificado</span><span class="pipe-n">54</span></div><div class="pipe-track"><div class="pipe-fill" style="width:62%;background:#A78BFA;"></div></div></div>
+        <div class="pipe-item"><div class="pipe-head"><span>Propuesta enviada</span><span class="pipe-n">38</span></div><div class="pipe-track"><div class="pipe-fill" style="width:44%;background:#FCD34D;"></div></div></div>
+        <div class="pipe-item" style="margin:0;"><div class="pipe-head"><span>Venta cerrada</span><span class="pipe-n" style="color:var(--green);">34</span></div><div class="pipe-track"><div class="pipe-fill" style="width:39%;background:#6EE7B7;"></div></div></div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-title">Contenido que genera ventas <span class="dcard-sub">revenue atribuido</span></div>
+        <div class="citem"><span class="citem-name">Reel Nike Air Max<span class="cbadge seg-hot">HOT</span></span><div class="cstats"><div class="cstat"><div class="cstat-val">12</div><div class="cstat-lbl">DMs</div></div><div class="cstat"><div class="cstat-val green">$480</div><div class="cstat-lbl">ventas</div></div></div></div>
+        <div class="citem"><span class="citem-name">Trigger "NIKE"<span class="cbadge seg-hot">HOT</span></span><div class="cstats"><div class="cstat"><div class="cstat-val">22</div><div class="cstat-lbl">activ.</div></div><div class="cstat"><div class="cstat-val green">$660</div><div class="cstat-lbl">ventas</div></div></div></div>
+        <div class="citem"><span class="citem-name">Story iPhone 14</span><div class="cstats"><div class="cstat"><div class="cstat-val">9</div><div class="cstat-lbl">DMs</div></div><div class="cstat"><div class="cstat-val green">$850</div><div class="cstat-lbl">ventas</div></div></div></div>
+        <div class="citem"><span class="citem-name">Post Adidas</span><div class="cstats"><div class="cstat"><div class="cstat-val">3</div><div class="cstat-lbl">DMs</div></div><div class="cstat"><div class="cstat-val red">$0</div><div class="cstat-lbl">ventas</div></div></div></div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">Squad de agentes IA</div>
+    <div class="agents-grid">
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Recepcionista</span><span class="ag-dot"></span></div><div class="ag-val">234</div><div class="ag-lbl">conversaciones iniciadas</div><div class="ag-track"><div class="ag-fill" style="width:95%;background:#93C5FD;"></div></div></div>
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Vendedor</span><span class="ag-dot"></span></div><div class="ag-val">34%</div><div class="ag-lbl">tasa de cierre</div><div class="ag-track"><div class="ag-fill" style="width:34%;background:#6EE7B7;"></div></div></div>
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Recuperador</span><span class="ag-dot"></span></div><div class="ag-val">12</div><div class="ag-lbl">carritos recuperados</div><div class="ag-track"><div class="ag-fill" style="width:55%;background:#FCD34D;"></div></div></div>
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Post-venta</span><span class="ag-dot"></span></div><div class="ag-val">8</div><div class="ag-lbl">reseñas conseguidas</div><div class="ag-track"><div class="ag-fill" style="width:45%;background:#F9A8D4;"></div></div></div>
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Analista</span><span class="ag-dot"></span></div><div class="ag-val">3</div><div class="ag-lbl">insights generados</div><div class="ag-track"><div class="ag-fill" style="width:100%;background:#A78BFA;"></div></div></div>
+      <div class="agcard"><div class="ag-top"><span class="ag-name">Operador</span><span class="ag-dot"></span></div><div class="ag-val">47</div><div class="ag-lbl">tareas ejecutadas</div><div class="ag-track"><div class="ag-fill" style="width:78%;background:#6EE7B7;"></div></div></div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-i">💡</div>
+      <div class="insight-t"><strong>Insight del Analista:</strong> Tus ventas los sábados son 60% menores. Respondés tarde esa tarde — perdiste $680 estimados este mes. Activar respuesta automática los sábados lo resuelve.</div>
+      <div class="insight-btn">Activar →</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACTS VIEW -->
+<div class="view" id="view-contacts">
+  <div class="contacts-layout">
+    <div class="page-controls">
+      <div><div class="page-title-row">Contactos</div><div class="page-sub-row">234 contactos · 18 calientes ahora</div></div>
+      <div class="btns-row"><button class="btn-sec">Exportar CSV</button><button class="btn-pri">+ Agregar</button></div>
+    </div>
+    <table class="ctable">
+      <thead><tr><th>Cliente</th><th>Canales</th><th>Score</th><th>Segmento</th><th>Compras</th><th>Última interacción</th><th>Tags</th></tr></thead>
+      <tbody>
+        <tr><td><div class="td-name-cell"><div class="tav" style="background:#EFF6FF;color:#1D4ED8;">MG</div><div><div class="td-name-text">Marcos García</div><div class="td-handle">@marcosok92</div></div></div></td><td><div class="ch-chips"><span class="ch-pill ch-ig">IG</span><span class="ch-pill ch-wa">WA</span></div></td><td><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--blue);">87</span></td><td><span class="seg-hot">HOT</span></td><td style="font-size:12px;font-weight:500;color:var(--green);">3 · $340</td><td style="font-size:11px;color:var(--text3);">hace 2 min</td><td><div class="ch-chips"><span class="pp-tag tag-blue" style="font-size:9px;">Nike</span><span class="pp-tag tag-amber" style="font-size:9px;">cuotas</span></div></td></tr>
+        <tr><td><div class="td-name-cell"><div class="tav" style="background:#F0FDF4;color:#166534;">LS</div><div><div class="td-name-text">Laura Sánchez</div><div class="td-handle">Marketplace</div></div></div></td><td><div class="ch-chips"><span class="ch-pill ch-mp">MP</span></div></td><td><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--amber);">64</span></td><td><span class="seg-warm">TIBIO</span></td><td style="font-size:12px;font-weight:500;color:var(--text2);">1 · $95</td><td style="font-size:11px;color:var(--text3);">hace 8 min</td><td><div class="ch-chips"><span class="pp-tag tag-green" style="font-size:9px;">precio</span></div></td></tr>
+        <tr><td><div class="td-name-cell"><div class="tav" style="background:#EFF6FF;color:#1D4ED8;">PR</div><div><div class="td-name-text">Pedro Ruiz</div><div class="td-handle">WhatsApp</div></div></div></td><td><div class="ch-chips"><span class="ch-pill ch-wa">WA</span></div></td><td><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--amber);">71</span></td><td><span class="seg-warm">TIBIO</span></td><td style="font-size:12px;font-weight:500;color:var(--text2);">2 · $180</td><td style="font-size:11px;color:var(--text3);">hace 15 min</td><td><div class="ch-chips"><span class="pp-tag tag-blue" style="font-size:9px;">iPhone</span><span class="pp-tag tag-amber" style="font-size:9px;">cuotas</span></div></td></tr>
+        <tr><td><div class="td-name-cell"><div class="tav" style="background:#F5F3FF;color:#5B21B6;">JM</div><div><div class="td-name-text">Juan Méndez</div><div class="td-handle">@juanm_ok</div></div></div></td><td><div class="ch-chips"><span class="ch-pill ch-ig">IG</span></div></td><td><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--blue);">92</span></td><td><span class="seg-hot">HOT</span></td><td style="font-size:12px;font-weight:500;color:var(--text3);">0 · $0</td><td style="font-size:11px;color:var(--text3);">hace 1h</td><td><div class="ch-chips"><span class="pp-tag tag-blue" style="font-size:9px;">iPhone</span></div></td></tr>
+        <tr><td><div class="td-name-cell"><div class="tav" style="background:#FDF2F8;color:#9D174D;">AT</div><div><div class="td-name-text">Ana Torres</div><div class="td-handle">@anatorres</div></div></div></td><td><div class="ch-chips"><span class="ch-pill ch-ig">IG</span><span class="ch-pill ch-mp">MP</span><span class="ch-pill ch-wa">WA</span></div></td><td><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--text2);">38</span></td><td><span class="seg-cold">FRÍO</span></td><td style="font-size:12px;font-weight:500;color:var(--green);">5 · $620</td><td style="font-size:11px;color:var(--red);">hace 62 días ⚠</td><td><div class="ch-chips"><span class="pp-tag tag-red" style="font-size:9px;">VIP inactiva</span></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- STOCK VIEW -->
+<div class="view" id="view-stock">
+  <div class="stock-layout">
+    <div class="page-controls">
+      <div><div class="page-title-row">Stock y productos</div><div class="page-sub-row">8 productos · 3 con wishlist activa</div></div>
+      <div class="btns-row"><button class="btn-sec">Importar Excel</button><button class="btn-pri">+ Agregar producto</button></div>
+    </div>
+    <div class="stock-grid">
+      <div class="pcard"><span class="pcard-badge pbg-ok">En stock</span><div class="pcard-img">👟</div><div class="pcard-name">Nike Air Max 42 Negro</div><div class="pcard-price">$120</div><div class="pcard-stock ok">● 3 unidades</div><div class="pcard-wl">0 en wishlist</div></div>
+      <div class="pcard low"><span class="pcard-badge pbg-low">Stock bajo</span><div class="pcard-img">👟</div><div class="pcard-name">Nike Air Max 42 Blanco</div><div class="pcard-price">$115</div><div class="pcard-stock low">⚠ 1 unidad</div><div class="pcard-wl">· 4 esperando</div></div>
+      <div class="pcard none"><span class="pcard-badge pbg-none">Sin stock</span><div class="pcard-img">📱</div><div class="pcard-name">iPhone 14 Pro 128GB Negro</div><div class="pcard-price">$850</div><div class="pcard-stock none">✕ Sin stock</div><div class="pcard-wl">· 7 esperando 🔥</div></div>
+      <div class="pcard"><span class="pcard-badge pbg-ok">En stock</span><div class="pcard-img">📱</div><div class="pcard-name">iPhone 14 Pro 256GB Blanco</div><div class="pcard-price">$920</div><div class="pcard-stock ok">● 2 unidades</div><div class="pcard-wl">· 2 en wishlist</div></div>
+      <div class="pcard"><span class="pcard-badge pbg-ok">En stock</span><div class="pcard-img">👟</div><div class="pcard-name">Adidas Samba 41 Negro</div><div class="pcard-price">$98</div><div class="pcard-stock ok">● 6 unidades</div><div class="pcard-wl">0 en wishlist</div></div>
+      <div class="pcard low"><span class="pcard-badge pbg-low">Stock bajo</span><div class="pcard-img">📱</div><div class="pcard-name">Samsung Galaxy S24</div><div class="pcard-price">$720</div><div class="pcard-stock low">⚠ 2 unidades</div><div class="pcard-wl">· 1 en wishlist</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRIGGERS VIEW -->
+<div class="view" id="view-triggers">
+  <div class="triggers-layout">
+    <div class="page-controls">
+      <div><div class="page-title-row">Triggers de comentarios</div><div class="page-sub-row">Palabras clave que disparan DMs automáticos al instante</div></div>
+      <button class="btn-pri">+ Nuevo trigger</button>
+    </div>
+    <div class="trig-item"><div class="trig-kw">NIKE</div><div class="trig-body"><div class="trig-desc">Cuando alguien comenta "NIKE" en cualquier post o reel</div><div class="trig-msg">"¡Hola! Vi que te interesó la línea Nike 👟 Te mando el catálogo completo con todos los modelos y precios disponibles ahora mismo."</div><div class="trig-stats"><div class="tstat">Activaciones esta semana: <span>22</span></div><div class="tstat">Revenue: <span class="green">$660</span></div><div class="tstat">Conversión: <span>41%</span></div></div></div><div class="trig-toggle-wrap"><button class="trig-toggle"></button><span class="trig-on-label">ON</span></div></div>
+    <div class="trig-item"><div class="trig-kw">PRECIO</div><div class="trig-body"><div class="trig-desc">Cuando alguien comenta pidiendo precios</div><div class="trig-msg">"¡Hola! Te paso precios actualizados 💰 Tenemos desde $98 hasta $920. ¿Qué producto te interesa?"</div><div class="trig-stats"><div class="tstat">Activaciones: <span>15</span></div><div class="tstat">Revenue: <span class="green">$340</span></div><div class="tstat">Conversión: <span>33%</span></div></div></div><div class="trig-toggle-wrap"><button class="trig-toggle"></button><span class="trig-on-label">ON</span></div></div>
+    <div class="trig-item"><div class="trig-kw">IPHONE</div><div class="trig-body"><div class="trig-desc">Para posts de tecnología y celulares</div><div class="trig-msg">"¡Hola! Los iPhone están disponibles 📱 Tenemos el 14 Pro con garantía oficial y hasta 12 cuotas. ¿Te mando los detalles?"</div><div class="trig-stats"><div class="tstat">Activaciones: <span>9</span></div><div class="tstat">Revenue: <span class="green">$1.700</span></div><div class="tstat">Conversión: <span>44%</span></div></div></div><div class="trig-toggle-wrap"><button class="trig-toggle"></button><span class="trig-on-label">ON</span></div></div>
+    <div class="trig-item"><div class="trig-kw">INFO</div><div class="trig-body"><div class="trig-desc">Trigger general para cualquier consulta</div><div class="trig-msg">"¡Hola! Con gusto te ayudo. ¿Qué producto estás buscando? Tenemos Nike, iPhone y más con envío a todo el país 🚀"</div><div class="trig-stats"><div class="tstat">Activaciones: <span>31</span></div><div class="tstat">Revenue: <span class="green">$520</span></div><div class="tstat">Conversión: <span>28%</span></div></div></div><div class="trig-toggle-wrap"><button class="trig-toggle"></button><span class="trig-on-label">ON</span></div></div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end body -->
+
+<script>
+const contacts=[
+  {init:'MG',bg:'#EFF6FF',tc:'#1D4ED8',name:'Marcos García',handle:'@marcosok92',ch:'ch-ig',chLabel:'Instagram',score:87,seg:'hot',segText:'🔥 compra inminente',preview:'si dale, reservame uno',time:'2m',tags:[{t:'fan Nike',c:'tag-blue'},{t:'cuotas',c:'tag-amber'},{t:'frecuente',c:'tag-green'}],channels:[{l:'Instagram',c:'ch-ig'},{l:'WhatsApp',c:'ch-wa'}],alerts:[{t:'a-fire',m:'💰 Venta en progreso — Nike $120'},{t:'a-info',m:'📦 Stock bajo: 2 pares talle 42'},{t:'a-good',m:'⭐ Pedir reseña post-compra'}],sugg:'"Marcos, ya que te llevás las Nike, tenemos los nuevos Jordan en tu talle. ¿Te mando fotos?"'},
+  {init:'LS',bg:'#F0FDF4',tc:'#166534',name:'Laura Sánchez',handle:'Marketplace',ch:'ch-mp',chLabel:'Marketplace',score:64,seg:'warm',segText:'🟡 interesado, no decidido',preview:'¿hacen envíos?',time:'8m',tags:[{t:'precio',c:'tag-green'}],channels:[{l:'Marketplace',c:'ch-mp'}],alerts:[{t:'a-info',m:'📍 Primer contacto por Marketplace'},{t:'a-fire',m:'💡 Preguntó envíos — ofrecer MercadoEnvíos'}],sugg:'"Hola Laura, sí hacemos envíos a todo el país. ¿A qué provincia sería? Te calculo el costo ahora."'},
+  {init:'PR',bg:'#EFF6FF',tc:'#1D4ED8',name:'Pedro Ruiz',handle:'WhatsApp',ch:'ch-wa',chLabel:'WhatsApp',score:71,seg:'warm',segText:'🟡 interesado en iPhone',preview:'¿aceptan cuotas?',time:'15m',tags:[{t:'iPhone',c:'tag-blue'},{t:'cuotas',c:'tag-amber'}],channels:[{l:'WhatsApp',c:'ch-wa'}],alerts:[{t:'a-fire',m:'📱 Interesado en iPhone 14 Pro'},{t:'a-info',m:'💳 Mencionar 12 cuotas sin interés'}],sugg:'"Pedro, el iPhone 14 Pro en 12 cuotas queda ~$71/mes. Tenemos 2 unidades. ¿Arrancamos?"'},
+  {init:'JM',bg:'#F5F3FF',tc:'#5B21B6',name:'Juan Méndez',handle:'@juanm_ok',ch:'ch-ig',chLabel:'Instagram',score:92,seg:'hot',segText:'🔥 compra inminente — actuar ya',preview:'quiero el iPhone 14',time:'1h',tags:[{t:'iPhone',c:'tag-blue'},{t:'nuevo',c:'tag-green'}],channels:[{l:'Instagram',c:'ch-ig'}],alerts:[{t:'a-fire',m:'🔥 Score 92 — nunca compró'},{t:'a-info',m:'📱 Sin stock 128GB negro'}],sugg:'"Juan, el 256GB está disponible ahora — 2 unidades. ¿Te lo reservo antes de que se agote?"'},
+  {init:'AT',bg:'#FDF2F8',tc:'#9D174D',name:'Ana Torres',handle:'@anatorres',ch:'ch-ig',chLabel:'Instagram',score:38,seg:'cold',segText:'🔵 VIP inactiva 62 días',preview:'gracias por todo!',time:'3h',tags:[{t:'VIP',c:'tag-red'},{t:'Nike',c:'tag-blue'}],channels:[{l:'Instagram',c:'ch-ig'},{l:'Marketplace',c:'ch-mp'},{l:'WhatsApp',c:'ch-wa'}],alerts:[{t:'a-fire',m:'⚠ VIP inactiva 62 días'},{t:'a-good',m:'🎁 Cumple en 12 días — descuento VIP'}],sugg:'"Ana! Te extrañamos 🌟 Llegaron Nike nuevas en tu talle 38. Como VIP tenés 15% off esta semana."'}
+];
+let activeC=0,aiOn=true;
+function renderContacts(){
+  const el=document.querySelector('.inbox-items');
+  el.innerHTML=contacts.map((c,i)=>{
+    const segClass=c.seg==='hot'?'seg-hot':c.seg==='warm'?'seg-warm':'seg-cold';
+    const barColor=c.seg==='hot'?'#2563EB':c.seg==='warm'?'#D97706':'#6B7280';
+    return`<div class="inbox-item${i===activeC?' active':''}" onclick="selectContact(${i})">
+      <div class="ii-row1"><div class="ii-avatar" style="background:${c.bg};color:${c.tc};">${c.init}</div><span class="ii-name">${c.name}</span><span class="ii-time">${c.time}</span></div>
+      <div class="ii-preview">${c.preview}</div>
+      <div class="ii-row3"><span class="ch-pill ${c.ch}">${c.chLabel}</span><div class="score-track"><div class="score-fill" style="width:${c.score}%;background:${barColor};"></div></div><span class="score-num" style="color:${barColor};">${c.score}</span><span class="${segClass}" style="margin-left:4px;">${c.seg.toUpperCase()}</span></div>
+    </div>`;
+  }).join('');
+}
+function selectContact(i){
+  activeC=i;
+  const c=contacts[i];
+  renderContacts();
+  document.getElementById('chat-av').textContent=c.init;
+  document.getElementById('chat-av').style.background=c.bg;
+  document.getElementById('chat-av').style.color=c.tc;
+  document.getElementById('chat-name').innerHTML=`${c.name} · <span style="font-weight:400;color:var(--text3);">${c.handle}</span>`;
+  document.getElementById('chat-score').textContent=c.score;
+  document.getElementById('pp-score').textContent=c.score;
+  document.getElementById('pp-ctx').textContent=c.segText;
+  const barColor=c.seg==='hot'?'#2563EB':c.seg==='warm'?'#D97706':'#6B7280';
+  document.getElementById('pp-bar').style.width=c.score+'%';
+  document.getElementById('pp-bar').style.background=barColor;
+  const segClass=c.seg==='hot'?'seg-hot':c.seg==='warm'?'seg-warm':'seg-cold';
+  const segText=c.seg==='hot'?'HOT — Caliente':c.seg==='warm'?'TIBIO — Interesado':'FRÍO — Inactivo';
+  document.getElementById('pp-seg').className=segClass;
+  document.getElementById('pp-seg').textContent=segText;
+  document.getElementById('pp-tags').innerHTML=c.tags.map(t=>`<span class="pp-tag ${t.c}">${t.t}</span>`).join('');
+  document.getElementById('pp-channels').innerHTML=c.channels.map(ch=>`<span class="ch-pill ${ch.c}">${ch.l}</span>`).join('');
+  document.getElementById('pp-alerts').innerHTML=c.alerts.map(a=>`<div class="alert-item ${a.t}">${a.m}</div>`).join('');
+  document.getElementById('pp-suggestion').textContent=c.sugg;
+}
+function toggleAI(el){
+  aiOn=!aiOn;
+  document.getElementById('ai-sw').classList.toggle('off',!aiOn);
+  document.getElementById('ai-label').textContent=aiOn?'IA activa':'IA pausada';
+  document.getElementById('ai-label').style.color=aiOn?'var(--text2)':'var(--red)';
+}
+function sendMsg(){
+  const inp=document.getElementById('msg-in');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  const msgs=document.getElementById('messages');
+  const d=document.createElement('div');
+  d.className='msg out';
+  d.innerHTML=`<div class="msg-bubble">${txt}</div><div class="msg-foot"><span class="msg-time">ahora</span></div>`;
+  msgs.appendChild(d);
+  inp.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  if(aiOn){
+    setTimeout(()=>{
+      const t=document.createElement('div');
+      t.className='msg in';t.id='typing';
+      t.innerHTML=`<div class="msg-bubble"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`;
+      msgs.appendChild(t);msgs.scrollTop=msgs.scrollHeight;
+      setTimeout(()=>{
+        const ty=document.getElementById('typing');if(ty)ty.remove();
+        const r=document.createElement('div');r.className='msg in';
+        r.innerHTML=`<div class="msg-bubble">Entendido, te respondo enseguida 👍</div><div class="msg-foot"><span class="msg-time">ahora</span><span class="ai-tag">IA</span></div>`;
+        msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;
+      },1800);
+    },500);
+  }
+}
+function useSugg(){
+  const s=document.getElementById('pp-suggestion').textContent.replace(/^"|"$/g,'');
+  document.getElementById('msg-in').value=s;
+  document.getElementById('msg-in').focus();
+}
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.tnav').forEach(el=>el.classList.remove('active'));
+  const map={inbox:0,contacts:1,stock:2,triggers:3,dashboard:4};
+  if(map[v]!==undefined)document.querySelectorAll('.tnav')[map[v]].classList.add('active');
+  document.querySelectorAll('.slink').forEach(el=>el.classList.remove('active'));
+}
+function filterSeg(s){}
+document.getElementById('msg-in').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+renderContacts();
+</script>
+</body>
+</html>
