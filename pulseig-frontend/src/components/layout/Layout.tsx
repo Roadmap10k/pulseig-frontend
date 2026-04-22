@@ -4,43 +4,21 @@ import { useAuthStore } from '../../store';
 import styles from './Layout.module.css';
 
 const NAV = [
-  { path: '/inbox',     label: 'Bandeja',    icon: '💬', badge: null },
-  { path: '/contacts',  label: 'Contactos',  icon: '👥', badge: null },
-  { path: '/products',  label: 'Stock',      icon: '📦', badge: null },
-  { path: '/triggers',  label: 'Triggers',   icon: '⚡', badge: null },
-  { path: '/dashboard', label: 'Dashboard',  icon: '📊', badge: null },
-];
-
-const SIDEBAR_SECTIONS = [
-  {
-    label: 'Conversaciones',
-    links: [
-      { path: '/inbox', icon: '💬', label: 'Todas', badge: '12', badgeType: 'red' },
-      { path: '/inbox?seg=hot', icon: '🔥', label: 'Calientes', badge: '5', badgeType: 'red' },
-      { path: '/inbox?ai=1', icon: '🤖', label: 'Gestionadas por IA', badge: '28', badgeType: 'gray' },
-      { path: '/inbox?status=waiting', icon: '⏳', label: 'Sin responder', badge: '3', badgeType: 'red' },
-    ],
-  },
-  {
-    label: 'Campañas',
-    links: [
-      { path: '/contacts?campaign=reengagement', icon: '🔄', label: 'Re-engagement', badge: null, badgeType: '' },
-      { path: '/inbox?campaign=cart', icon: '🛒', label: 'Carritos', badge: '4', badgeType: 'red' },
-      { path: '/contacts?campaign=postventa', icon: '⭐', label: 'Post-venta', badge: null, badgeType: '' },
-    ],
-  },
+  { path: '/inbox',     label: 'Bandeja' },
+  { path: '/contacts',  label: 'Contactos' },
+  { path: '/products',  label: 'Stock' },
+  { path: '/triggers',  label: 'Triggers' },
+  { path: '/dashboard', label: 'Dashboard' },
 ];
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { business, logout } = useAuthStore();
-
-  const isActive = (path: string) => location.pathname === path.split('?')[0];
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className={styles.app}>
-      {/* TOPBAR */}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
           <div className={styles.logo}>P</div>
@@ -49,89 +27,73 @@ export default function Layout() {
           <div className={styles.bizChip}>
             <span className={styles.bizDot} />
             <span className={styles.bizName}>{business?.name || 'Mi Negocio'}</span>
-            <span className={styles.bizCaret}>▾</span>
           </div>
         </div>
-
         <nav className={styles.topNav}>
           {NAV.map(item => (
-            <button
-              key={item.path}
-              className={`${styles.navBtn} ${isActive(item.path) ? styles.navBtnActive : ''}`}
-              onClick={() => navigate(item.path)}
-            >
+            <button key={item.path} className={`${styles.navBtn} ${isActive(item.path) ? styles.navBtnActive : ''}`} onClick={() => navigate(item.path)}>
               {item.label}
             </button>
           ))}
         </nav>
-
         <div className={styles.topbarRight}>
-          <button className={styles.periodBtn}>Abril 2026 ▾</button>
-          <button className={styles.iconBtn} title="Notificaciones">
-            🔔
-            <span className={styles.notifPip} />
-          </button>
-          <div
-            className={styles.userAvatar}
-            onClick={logout}
-            title="Cerrar sesión"
-          >
-            {business?.name?.slice(0, 2).toUpperCase() || 'TN'}
+          <button className={styles.iconBtn} onClick={() => navigate('/settings')} title="Configuración">⚙️</button>
+          <div className={styles.userAvatar} onClick={logout} title="Cerrar sesión">
+            {business?.name?.slice(0,2).toUpperCase() || 'TN'}
           </div>
         </div>
       </header>
 
       <div className={styles.body}>
-        {/* SIDEBAR */}
         <aside className={styles.sidebar}>
-          {SIDEBAR_SECTIONS.map(section => (
-            <div key={section.label} className={styles.sidebarSection}>
-              <div className={styles.sectionLabel}>{section.label}</div>
-              {section.links.map(link => (
-                <button
-                  key={link.path}
-                  className={`${styles.sideLink} ${isActive(link.path) ? styles.sideLinkActive : ''}`}
-                  onClick={() => navigate(link.path)}
-                >
-                  <span className={styles.sideLinkIcon}>{link.icon}</span>
-                  <span className={styles.sideLinkText}>{link.label}</span>
-                  {link.badge && (
-                    <span className={`${styles.sideBadge} ${link.badgeType === 'red' ? styles.badgeRed : styles.badgeGray}`}>
-                      {link.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-              <div className={styles.sectionDivider} />
-            </div>
-          ))}
+          <div className={styles.sidebarSection}>
+            <div className={styles.sectionLabel}>Conversaciones</div>
+            <button className={`${styles.sideLink} ${isActive('/inbox') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/inbox')}>
+              <span className={styles.sideLinkIcon}>💬</span><span className={styles.sideLinkText}>Todas</span>
+            </button>
+            <button className={styles.sideLink} onClick={() => navigate('/inbox?seg=hot')}>
+              <span className={styles.sideLinkIcon}>🔥</span><span className={styles.sideLinkText}>Calientes</span>
+            </button>
+            <button className={styles.sideLink} onClick={() => navigate('/inbox?ai=1')}>
+              <span className={styles.sideLinkIcon}>🤖</span><span className={styles.sideLinkText}>Gestionadas por IA</span>
+            </button>
+          </div>
+          <div className={styles.sectionDivider} />
+          <div className={styles.sidebarSection}>
+            <div className={styles.sectionLabel}>Campañas</div>
+            <button className={`${styles.sideLink} ${isActive('/reengagement') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/reengagement')}>
+              <span className={styles.sideLinkIcon}>🔄</span><span className={styles.sideLinkText}>Re-engagement</span>
+            </button>
+            <button className={styles.sideLink}>
+              <span className={styles.sideLinkIcon}>🛒</span><span className={styles.sideLinkText}>Carritos</span>
+            </button>
+            <button className={styles.sideLink}>
+              <span className={styles.sideLinkIcon}>⭐</span><span className={styles.sideLinkText}>Post-venta</span>
+            </button>
+          </div>
+          <div className={styles.sectionDivider} />
           <div className={styles.sidebarSection}>
             <div className={styles.sectionLabel}>Sistema</div>
-            <button className={styles.sideLink} onClick={() => navigate('/products')}>
-              <span className={styles.sideLinkIcon}>📦</span>
-              <span className={styles.sideLinkText}>Stock</span>
+            <button className={`${styles.sideLink} ${isActive('/products') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/products')}>
+              <span className={styles.sideLinkIcon}>📦</span><span className={styles.sideLinkText}>Stock</span>
             </button>
-            <button className={styles.sideLink} onClick={() => navigate('/triggers')}>
-              <span className={styles.sideLinkIcon}>⚡</span>
-              <span className={styles.sideLinkText}>Triggers</span>
+            <button className={`${styles.sideLink} ${isActive('/triggers') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/triggers')}>
+              <span className={styles.sideLinkIcon}>⚡</span><span className={styles.sideLinkText}>Triggers</span>
             </button>
-            <button className={styles.sideLink} onClick={() => navigate('/dashboard')}>
-              <span className={styles.sideLinkIcon}>📊</span>
-              <span className={styles.sideLinkText}>ROI Dashboard</span>
+            <button className={`${styles.sideLink} ${isActive('/dashboard') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/dashboard')}>
+              <span className={styles.sideLinkIcon}>📊</span><span className={styles.sideLinkText}>ROI Dashboard</span>
+            </button>
+            <button className={`${styles.sideLink} ${isActive('/contacts') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/contacts')}>
+              <span className={styles.sideLinkIcon}>👥</span><span className={styles.sideLinkText}>Contactos</span>
             </button>
           </div>
           <div className={styles.sidebarBottom}>
-            <button className={styles.sideLink}>
-              <span className={styles.sideLinkIcon}>⚙️</span>
-              <span className={styles.sideLinkText}>Configuración</span>
+            <button className={`${styles.sideLink} ${isActive('/settings') ? styles.sideLinkActive : ''}`} onClick={() => navigate('/settings')}>
+              <span className={styles.sideLinkIcon}>⚙️</span><span className={styles.sideLinkText}>Configuración</span>
             </button>
           </div>
         </aside>
-
-        {/* MAIN CONTENT */}
-        <main className={styles.main}>
-          <Outlet />
-        </main>
+        <main className={styles.main}><Outlet /></main>
       </div>
     </div>
   );
